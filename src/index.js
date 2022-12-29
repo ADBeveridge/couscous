@@ -6,7 +6,9 @@ import { fileURLToPath } from "url";
 import { Router } from "express";
 import { createPool } from "mysql2/promise";
 import mysql from "mysql";
+import { request } from "http";
 
+// Used by login system
 const connection = mysql.createConnection({
 	host: 'localhost',
 	user: 'root',
@@ -14,6 +16,7 @@ const connection = mysql.createConnection({
 	database: 'customersdb'
 });
 
+// Used by customers system.
 const pool = createPool({
 	host: "localhost",
 	user: "root",
@@ -21,18 +24,41 @@ const pool = createPool({
 	database: "customersdb",
 });
 
-const renderCustomers = async (req, res) => {
-	const [rows] = await pool.query("SELECT * FROM customer");
-	res.render("customers", { customers: rows });
+const createDonation = async (req, res) => {
+
+	/*let fname = request.body.fname;
+	let lname = request.body.lname;*/
+
+	/* See if the donor has already donated to the organization. */
+	connection.query('SELECT * FROM donors WHERE email = ?', [req.body.email], function (error, results, fields) {
+		if (error) throw error;
+		if (results.length >= 1) {
+			connection.query('INSERT INTO donations SET ?',
+				{ paymentAmount: req.body.paymentAmount,
+				  paymentDetails: req.body.paymentDetails,
+			      paymentType: req.body.paymentType,
+				  paymentMethod: req.body.paymentMethod,
+				  paymentDate: req.body.paymentDate,
+				  paymentTime: req.body.paymentTime,
+				  donor: results[0].id,
+				  creator: req.session.userid
+			    },
+
+				function (error, results, fields) {
+					if (error) throw error;
+				});
+
+			res.redirect("/customers");
+		} else {
+			res.send('That person does not exist!');
+		}
+	});
+
+	//await pool.query("INSERT INTO donations set ?", [newCustomer]);
+
 };
 
-const createCustomers = async (req, res) => {
-	const newCustomer = req.body;
-	await pool.query("INSERT INTO customer set ?", [newCustomer]);
-	res.redirect("/customers");
-};
-
-const editCustomer = async (req, res) => {
+const editDonation = async (req, res) => {
 	const { id } = req.params;
 	const [result] = await pool.query("SELECT * FROM customer WHERE id = ?", [
 		id,
@@ -40,19 +66,10 @@ const editCustomer = async (req, res) => {
 	res.render("customers_edit", { customer: result[0] });
 };
 
-const updateCustomer = async (req, res) => {
+const updateDonation = async (req, res) => {
 	const { id } = req.params;
 	const newCustomer = req.body;
 	await pool.query("UPDATE customer set ? WHERE id = ?", [newCustomer, id]);
-	res.redirect("/customers");
-};
-
-const deleteCustomer = async (req, res) => {
-	const { id } = req.params;
-	const result = await pool.query("DELETE FROM customer WHERE id = ?", [id]);
-	if (result.affectedRows === 1) {
-		res.json({ message: "Customer deleted" });
-	}
 	res.redirect("/customers");
 };
 
@@ -73,18 +90,16 @@ app.set("view engine", "ejs");
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "public")));
 
-/* The first called function, just reroutes to login or customers. */
+/* The first called function, just reroutes to auth or customers. */
 app.get('/', function (request, response) {
-
 	// If the user is loggedin
-	if (request.session.loggedin) {
-		// Output username
-		response.redirect('/customers');
-		response.end();
-	} else {
+	if (!request.session.loggedin) {
 		response.sendFile(path.join(__dirname + '/login.html'));
+		return;
 	}
-
+	response.redirect('/customers');
+	console.log("Called!");
+	response.end();
 });
 
 /* This function is called by the action name in the html file. */
@@ -92,7 +107,6 @@ app.post('/auth', function (request, response) {
 	// Capture the input fields
 	let username = request.body.username;
 	let password = request.body.password;
-	console.log(username + " " + password);
 
 	if (!username || !password) {
 		response.send('Please enter Username and Password!');
@@ -105,15 +119,15 @@ app.post('/auth', function (request, response) {
 		// If there is an issue with the query, output the error
 		if (error) throw error;
 		// If the account exists
-		if (results.length > 0) {
-			// Authenticate the user
-			request.session.loggedin = true;
-			request.session.username = username;
-			// Redirect to home page
-			response.redirect('/customers');
-		} else {
+		if (results.length == 0) {
 			response.send('Incorrect Username and/or Password!');
+			return;
 		}
+		// Authenticate the user
+		request.session.loggedin = true;
+		request.session.username = username;
+		request.session.userid = results[0].id;
+		response.redirect('/customers');
 		response.end();
 	});
 });
@@ -122,11 +136,16 @@ app.post('/auth', function (request, response) {
 const customerRoutes = Router();
 app.use(customerRoutes);
 
-customerRoutes.get("/customers", renderCustomers);
-customerRoutes.post("/add", createCustomers);
+customerRoutes.get("/customers", function (req, res) {
+	res.sendFile(path.join(__dirname + '/home.html'));
+});
+
+customerRoutes.post("/add", createDonation);
+/*
 customerRoutes.get("/update/:id", editCustomer);
 customerRoutes.post("/update/:id", updateCustomer);
 customerRoutes.get("/delete/:id", deleteCustomer);
+*/
 
 // Port to run server on.
 const port = process.env.PORT || 3000;
