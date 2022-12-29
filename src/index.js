@@ -23,39 +23,47 @@ const pool = createPool({
 	password: "WwlzJ9gIVXQe",
 	database: "customersdb",
 });
-
+/*
+const addDonor = async (req, res) => {
+	const [rows] = await pool.query("SELECT * FROM customer");
+};
+  
+*/
 const createDonation = async (req, res) => {
+	/* See if the donor has already donated to the organization. Identifed only by email. */
+	const [data] = await pool.query('SELECT * FROM donors WHERE email = ?', [req.body.email]);
 
-	/*let fname = request.body.fname;
-	let lname = request.body.lname;*/
+	/* If the donor specified has not been created, then create him. */
+	if (data.length === 0) {
+		await pool.query('INSERT INTO donors SET ?',
+			{
+				fname: req.body.fname,
+				lname: req.body.lname,
+				email: req.body.email,
+				phone: req.body.phone,
+				address: req.body.address,
+				preferredContactMethod: req.body.preferredContactMethod,
+			});
+	}
 
-	/* See if the donor has already donated to the organization. */
-	connection.query('SELECT * FROM donors WHERE email = ?', [req.body.email], function (error, results, fields) {
-		if (error) throw error;
-		if (results.length >= 1) {
-			connection.query('INSERT INTO donations SET ?',
-				{ paymentAmount: req.body.paymentAmount,
-				  paymentDetails: req.body.paymentDetails,
-			      paymentType: req.body.paymentType,
-				  paymentMethod: req.body.paymentMethod,
-				  paymentDate: req.body.paymentDate,
-				  paymentTime: req.body.paymentTime,
-				  donor: results[0].id,
-				  creator: req.session.userid
-			    },
+	/* Now, repull it out, since he's gotta be in there. We need the id.. Used when specifying the donor during donation creation. */
+	const [rows] = await pool.query('SELECT * FROM donors WHERE email = ?', [req.body.email]);
 
-				function (error, results, fields) {
-					if (error) throw error;
-				});
+	/* Create the donation. */
+	await pool.query('INSERT INTO donations SET ?',
+		{
+			paymentAmount: req.body.paymentAmount,
+			paymentDetails: req.body.paymentDetails,
+			paymentType: req.body.paymentType,
+			paymentMethod: req.body.paymentMethod,
+			paymentDate: req.body.paymentDate,
+			paymentTime: req.body.paymentTime,
+			donor: rows[0].id,
+			creator: req.session.userid
+		});
 
-			res.redirect("/customers");
-		} else {
-			res.send('That person does not exist!');
-		}
-	});
-
-	//await pool.query("INSERT INTO donations set ?", [newCustomer]);
-
+	/* Is this needed? */
+	res.redirect("/customers");
 };
 
 const editDonation = async (req, res) => {
