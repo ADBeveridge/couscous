@@ -58,7 +58,7 @@ const createDonation = async (req, res) => {
 		});
 
 	/* Is this needed? */
-	res.redirect("/customers");
+	res.redirect("/");
 };
 
 const editDonation = async (req, res) => {
@@ -73,7 +73,7 @@ const updateDonation = async (req, res) => {
 	const { id } = req.params;
 	const newCustomer = req.body;
 	await pool.query("UPDATE customer set ? WHERE id = ?", [newCustomer, id]);
-	res.redirect("/customers");
+	res.redirect("/");
 };
 
 /* App. Configure what it uses. */
@@ -100,8 +100,7 @@ app.get('/', function (request, response) {
 		response.sendFile(path.join(__dirname + '/login.html'));
 		return;
 	}
-	response.redirect('/customers');
-	response.end();
+	response.sendFile(path.join(__dirname + '/home.html'));
 });
 
 /* This function is called by the action name in the html file. */
@@ -112,7 +111,6 @@ app.post('/auth', function (request, response) {
 
 	if (!username || !password) {
 		response.send('Please enter Username and Password!');
-		response.end();
 		return;
 	}
 
@@ -129,18 +127,13 @@ app.post('/auth', function (request, response) {
 		request.session.loggedin = true;
 		request.session.username = username;
 		request.session.userid = results[0].id;
-		response.redirect('/customers');
-		response.end();
+		response.redirect('/');
 	});
 });
 
 /* "miniapp" for routing with adding, editing, and deleting customers. */
 const customerRoutes = Router();
 app.use(customerRoutes);
-
-customerRoutes.get("/customers", function (req, res) {
-	res.sendFile(path.join(__dirname + '/home.html'));
-});
 
 customerRoutes.post("/add", createDonation);
 /*
