@@ -151,6 +151,11 @@ const updateDonor = async (req, res) => {
 	res.redirect("/edit");
 };
 
+const deleteCustomer = async (req, res) => {
+	const { id } = req.params;
+	await pool.query("DELETE FROM donors WHERE id = ?", [id]);
+	res.redirect("/edit");
+};
 
 const renderSched = async (req, res) => {
 
