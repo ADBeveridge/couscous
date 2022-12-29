@@ -28,7 +28,7 @@ const createDonation = async (req, res) => {
 	/* See if the donor has already donated to the organization. Identifed only by email. */
 	const [data] = await pool.query('SELECT * FROM donors WHERE email = ?', [req.body.email]);
 
-	/* If the donor specified has not been created, then create him. */
+	/* If the donor specified has not been created, then create him here. */
 	if (data.length === 0) {
 		await pool.query('INSERT INTO donors SET ?',
 			{
@@ -42,7 +42,7 @@ const createDonation = async (req, res) => {
 			});
 	}
 
-	/* Now, repull it out, since he's gotta be in there. We need the id.. Used when specifying the donor during donation creation. */
+	/* Now, repull it out, since he's gotta be in there. We need the id... Used when specifying the donor during donation creation. (FOREIGN KEY REFERENCES stuff...) */
 	const [rows] = await pool.query('SELECT * FROM donors WHERE email = ?', [req.body.email]);
 
 	/* Create the donation. */
@@ -52,11 +52,15 @@ const createDonation = async (req, res) => {
 			paymentDetails: req.body.paymentDetails,
 			paymentType: req.body.paymentType,
 			paymentMethod: req.body.paymentMethod,
-			paymentDate: req.body.paymentDate,
-			paymentTime: req.body.paymentTime,
+			paymentDateTime: req.body.paymentDateTime,
+			inputDateTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
 			donor: rows[0].id,
 			creator: req.session.userid
 		});
+	
+	/* Set the donor's most recent donation datetime. */
+	const [donations] = await pool.query('SELECT * FROM donations WHERE donor = ? ORDER BY paymentDateTime DESC', [rows[0].id]);
+	await pool.query('UPDATE donors SET lastPaymentDateTime = ? WHERE id = ?', [donations[0].paymentDateTime, rows[0].id]);
 
 	/* Is this needed? */
 	res.redirect("/");

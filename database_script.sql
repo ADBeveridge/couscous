@@ -27,20 +27,17 @@ create table donors (
   preferredContactMethod varchar(255),
   contactNotes varchar(255),
   frequency int,
-  lastPaymentDate date, 
-  lastPaymentTime time
+  lastPaymentDateTime datetime
 );
 
 create table donations (
   id int auto_increment primary key,
   paymentAmount double,
   paymentType varchar(255),
-  paymentDate date, 
-  paymentTime time,
+  paymentDateTime datetime,
   paymentMethod varchar(255),
   paymentDetails varchar(510),
-  inputDate date, 
-  inputTime time,
+  inputDateTime datetime, 
   creator int,
   donor int,
   foreign key (creator) references accounts(id),
