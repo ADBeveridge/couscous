@@ -131,16 +131,21 @@ app.post('/auth', function (request, response) {
 	});
 });
 
+app.get('/stat', function (request, response) {
+	// If the user is loggedin
+	if (!request.session.loggedin) {
+		response.sendFile(path.join(__dirname + '/login.html'));
+		return;
+	}
+
+	response.sendFile(path.join(__dirname + '/stat.html'));
+});
+
 /* "miniapp" for routing with adding, editing, and deleting customers. */
 const customerRoutes = Router();
 app.use(customerRoutes);
 
 customerRoutes.post("/add", createDonation);
-/*
-customerRoutes.get("/update/:id", editCustomer);
-customerRoutes.post("/update/:id", updateCustomer);
-customerRoutes.get("/delete/:id", deleteCustomer);
-*/
 
 // Port to run server on.
 const port = process.env.PORT || 3000;
