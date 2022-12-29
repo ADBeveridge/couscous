@@ -145,10 +145,16 @@ const updateDonor = async (req, res) => {
 	res.redirect("/edit");
 };
 
+const renderSched = async (req, res) => {
+	const [rows] = await pool.query('SELECT * FROM donations ORDER BY paymentDateTime DESC');
+	res.render("sched", { donations: rows });
+};
+
 customerRoutes.get("/edit", renderDonors);
 customerRoutes.post("/add", createDonation);
 customerRoutes.get("/update/:id", editDonor);
 customerRoutes.post("/update/:id", updateDonor);
+customerRoutes.get("/sched", renderSched);
 
 // Port to run server on.
 const port = process.env.PORT || 3000;
