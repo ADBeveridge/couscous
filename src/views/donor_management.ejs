@@ -15,6 +15,7 @@
             <td>Address</td>
             <td>Phone</td>
             <td>Donation Frequency</td>
+            <td>Last Donation Date</td>
             <td>Actions</td>
           </tr>
         </thead>
@@ -27,7 +28,8 @@
             <td><%= donors[i].email %></td>
             <td><%= donors[i].address %></td>
             <td><%= donors[i].phone %></td>
-            <td><%= donors[i].frequency %></td>
+            <td>Every <%= donors[i].frequency %> days</td>
+            <td><%= donors[i].lastPaymentDateTime %></td>
             <td class="d-flex gap-2">
               <a href="/update/<%= donors[i].id %>" class="btn btn-info">
                 Edit
