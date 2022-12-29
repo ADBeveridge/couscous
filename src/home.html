@@ -1,26 +1,32 @@
 <!DOCTYPE html>
 <html>
 
+<head>
+    <title>Home</title>
+</head>
+
 <body>
     <form action="/add" method="POST">
         <h1>New Donation Entry</h1>
         <h2>Donor Info</h2>
         <input type="text" name="fname" placeholder="First Name" autofocus />
-        <input type="text" name="lname" placeholder="Last Name"/>
+        <input type="text" name="lname" placeholder="Last Name" />
         <p></p>
-        <input type="email" name="email" placeholder="Email" required/>
-        <input type="text" name="phone" placeholder="Phone Number"/>
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="text" name="phone" placeholder="Phone Number" />
         <p></p>
-        <input type="text" name="address" placeholder="Address + City + ZIP"/>
-        <input type="text" name="preferredContactMethod" placeholder="Preferred Contact Method"/>
+        <input type="text" name="address" placeholder="Address + City + ZIP" />
+        <input type="text" name="preferredContactMethod" placeholder="Preferred Contact Method" />
         <p></p>
-        <i>Note: If there is a donor with the email (supplied above) in the database, then the new donation's donor will be linked to the existing donor with that email address, and a new donor will not be created with the rest of the fields above.</i>
+        <i>Note: If there is a donor with the email (supplied above) in the database, then the new donation's donor will
+            be linked to the existing donor with that email address, and a new donor will not be created with the rest
+            of the fields above.</i>
         <h2>Donation Info</h2>
-        <input type="number" name="paymentAmount" placeholder="Amount" step="0.01" required/>
-        <input type="text" name="paymentType" placeholder="Payment Type"/>
+        <input type="number" name="paymentAmount" placeholder="Amount" step="0.01" required />
+        <input type="text" name="paymentType" placeholder="Payment Type" />
         <p></p>
-        <input type="text" name="paymentMethod" placeholder="Payment Method"/>
-        <input type="text" name="paymentDetails" placeholder="Payment Details"/>
+        <input type="text" name="paymentMethod" placeholder="Payment Method" />
+        <input type="text" name="paymentDetails" placeholder="Payment Details" />
         <p></p>
         <label for="paymentDate">Date</label>
         <input type="date" id="paymentDate" name="paymentDate" required>
