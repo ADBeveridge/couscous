@@ -1,0 +1,26 @@
+
+
+<%- include("partials/_header") %>
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-7">
+      <table class="table table-dark table-bordered table-hover">
+        <thead>
+          <tr>
+            <td>Id</td>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (donations) { %> <% for(var i = 0; i < donations.length; i++) {%>
+          <tr>
+            <td><%= donations[i].id %></td>
+          </tr>
+          <% } %> <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include("partials/_footer") %>
