@@ -57,7 +57,7 @@ const createDonation = async (req, res) => {
 			donor: rows[0].id,
 			creator: req.session.userid
 		});
-	
+
 	/* Set the donor's most recent donation datetime. */
 	const [donations] = await pool.query('SELECT * FROM donations WHERE donor = ? ORDER BY paymentDateTime DESC', [rows[0].id]);
 	await pool.query('UPDATE donors SET lastPaymentDateTime = ? WHERE id = ?', [donations[0].paymentDateTime, rows[0].id]);
@@ -121,6 +121,12 @@ app.post('/auth', function (request, response) {
 	});
 });
 
+function sameDay(d1, d2) {
+	return d1.getFullYear() === d2.getFullYear() &&
+		d1.getMonth() === d2.getMonth() &&
+		d1.getDate() === d2.getDate();
+}
+
 /* "miniapp" for routing with adding, editing, and deleting customers. */
 const customerRoutes = Router();
 app.use(customerRoutes);
@@ -145,15 +151,38 @@ const updateDonor = async (req, res) => {
 	res.redirect("/edit");
 };
 
+
 const renderSched = async (req, res) => {
-	const [rows] = await pool.query('SELECT * FROM donations ORDER BY paymentDateTime DESC');
-	res.render("sched", { donations: rows });
+
+	/* Get a customers last donation, and coupled with his given donation frequency, calculate if he needs to donate today. */
+	var renderContents = [];
+
+	const [result] = await pool.query("SELECT * FROM donors");
+	for (var i = 0; i < result.length; i++) {
+		const [rows] = await pool.query('SELECT * FROM donations WHERE donor = ? ORDER BY paymentDateTime DESC', [result[i].id]);
+		if (rows.length === 0) {
+			break;
+		}
+
+		/* Calculate if the last donation date plus the frequency (which is in days) equals today. */
+		var frequency = result[i].frequency;
+		var fDate = new Date(rows[0].paymentDateTime);
+		fDate.setDate(fDate.getDate() + frequency); // Set the date forward by the frequency days.
+		var today = new Date();
+
+		if (sameDay(fDate, today) === true) {
+			renderContents.push(result[i]);
+		}
+	}
+
+	res.render("sched", { donations: renderContents });
 };
 
 customerRoutes.get("/edit", renderDonors);
 customerRoutes.post("/add", createDonation);
 customerRoutes.get("/update/:id", editDonor);
 customerRoutes.post("/update/:id", updateDonor);
+customerRoutes.get("/delete/:id", deleteCustomer);
 customerRoutes.get("/sched", renderSched);
 
 // Port to run server on.
