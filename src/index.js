@@ -151,6 +151,14 @@ const updateDonor = async (req, res) => {
 	res.redirect("/edit");
 };
 
+const askDelete = async (req, res) => {
+	const { id } = req.params;
+	const [result] = await pool.query("SELECT * FROM donors WHERE id = ?", [
+		id,
+	]);
+	res.render("delete", { donor: result[0] });
+};
+
 const deleteCustomer = async (req, res) => {
 	const { id } = req.params;
 	await pool.query("DELETE FROM donations WHERE donor = ?", [id]);
@@ -188,7 +196,7 @@ customerRoutes.get("/edit", renderDonors);
 customerRoutes.post("/add", createDonation);
 customerRoutes.get("/update/:id", editDonor);
 customerRoutes.post("/update/:id", updateDonor);
-customerRoutes.get("/delete/:id", deleteCustomer);
+customerRoutes.get("/delete/:id", askDelete);
 customerRoutes.post("/delete/:id", deleteCustomer);
 customerRoutes.get("/sched", renderSched);
 
