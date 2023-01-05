@@ -153,6 +153,7 @@ const updateDonor = async (req, res) => {
 
 const deleteCustomer = async (req, res) => {
 	const { id } = req.params;
+	await pool.query("DELETE FROM donations WHERE donor = ?", [id]);
 	await pool.query("DELETE FROM donors WHERE id = ?", [id]);
 	res.redirect("/edit");
 };
@@ -188,6 +189,7 @@ customerRoutes.post("/add", createDonation);
 customerRoutes.get("/update/:id", editDonor);
 customerRoutes.post("/update/:id", updateDonor);
 customerRoutes.get("/delete/:id", deleteCustomer);
+customerRoutes.post("/delete/:id", deleteCustomer);
 customerRoutes.get("/sched", renderSched);
 
 // Port to run server on.
