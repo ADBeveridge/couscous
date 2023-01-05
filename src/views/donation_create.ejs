@@ -36,8 +36,12 @@
               class="form-control mb-2" />
 
             <label for="preferredContactMethod" class="sr-only">Preferred Contact Method</label>
-            <input type="text" id="preferredContactMethod" name="preferredContactMethod"
-              placeholder="Preferred Contact Method" class="form-control mb-2" />
+            <select class="form-control mb-2" type="text" id="preferredContactMethod" name="preferredContactMethod" />
+            <option value="default">Contact Method</option>
+            <option>Email</option>
+            <option>Mail</option>
+            <option>Phone</option>
+            <option>Personal</option>
 
             <label for="frequency" class="sr-only">Frequency</label>
             <input type="number" id="frequency" name="frequency" placeholder="Donation Frequency" required
@@ -56,8 +60,12 @@
               class="form-control mb-2" />
 
             <label for="paymentMethod" class="sr-only">Payment Method</label>
-            <input type="text" id="paymentMethod" name="paymentMethod" placeholder="Payment Method"
-              class="form-control mb-2" />
+            <select class="form-control mb-2" type="text" id="paymentMethod" name="paymentMethod" placeholder="Payment Method" />
+            <option value="default">Payment Method</option>
+            <option>Cash</option>
+            <option>Debit</option>
+            <option>Credit</option>
+            <option>Check</option>
 
             <label for="paymentDetails" class="sr-only">Payment Details</label>
             <input type="text" id="paymentDetails" name="paymentDetails" placeholder="Payment Details"
