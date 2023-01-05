@@ -10,18 +10,18 @@ import { request } from "http";
 
 // Used by login system.
 const connection = mysql.createConnection({
-	host: 'localhost',
-	user: 'root',
-	password: 'WwlzJ9gIVXQe',
-	database: 'customersdb'
+	host: "awseb-e-aztph9uyyz-stack-awsebrdsdatabase-ta4zdp05fs81.c3kwci5hfksz.us-east-1.rds.amazonaws.com",
+	user: "admin",
+	password: "WwlzJ9gIVXQe",
+	database: "ebdb"
 });
 
 // Used by customers system.
 const pool = createPool({
-	host: "localhost",
-	user: "root",
+	host: "awseb-e-aztph9uyyz-stack-awsebrdsdatabase-ta4zdp05fs81.c3kwci5hfksz.us-east-1.rds.amazonaws.com",
+	user: "admin",
 	password: "WwlzJ9gIVXQe",
-	database: "customersdb",
+	database: "ebdb"
 });
 
 const createDonation = async (req, res) => {
