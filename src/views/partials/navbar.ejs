@@ -2,7 +2,7 @@
   <div class="container">
     <a class="" href="/">Home</a>
     <a class="" href="/createdonation">Create Donation</a>
-    <% if(info.isAdmin == true) { %>
+    <% if(info.status == "administrator") { %>
     <a class="" href="/users">Management</a>
     <% } %>
     <a class="" href="/donations">Audit Statistics</a>

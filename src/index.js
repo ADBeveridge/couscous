@@ -95,9 +95,7 @@ app.post('/auth', function (request, response) {
 		// Authenticate the user
 		request.session.loggedin = true;
 		request.session.email = email;
-		request.session.isAdmin = false;
-		if (results[0].status == "administrator")
-			request.session.isAdmin = true;
+		request.session.status = results[0].status;
 
 		response.redirect('/');
 	});
@@ -214,7 +212,7 @@ app.post("/delete/:id", async (req, res) => {
 /** User management. */
 app.get("/users", async (req, res) => {
 	if (!check(req, res)) { return; };
-	if (req.session.isAdmin == false) { res.sendStatus(404); return; }
+	if (req.session.status == "luser") { res.sendStatus(404); return; }
 	const [result] = await pool.query("SELECT * FROM accounts WHERE status is NULL && hidden = 0");
 	const [rows] = await pool.query("SELECT * FROM donors");
 	res.render("users", { users: result, info: req.session, donors: rows });
@@ -227,7 +225,7 @@ app.post("/adduser", async (req, res) => {
 });
 app.get("/updateuser/:id", async (req, res) => {
 	if (!check(req, res)) { return; };
-	if (req.session.isAdmin == false) { res.sendStatus(404); return; }
+	if (req.session.status == "luser") { res.sendStatus(404); return; }
 	const { id } = req.params;
 	const [result] = await pool.query("SELECT * FROM accounts where id = ?", [
 		id,
@@ -242,7 +240,7 @@ app.post("/updateuser/:id", async (req, res) => {
 });
 app.get("/deleteuser/:id", async (req, res) => {
 	if (!check(req, res)) { return; };
-	if (req.session.isAdmin == false) { res.sendStatus(404); return; }
+	if (req.session.status == "luser") { res.sendStatus(404); return; }
 	const { id } = req.params;
 	const [result] = await pool.query("SELECT * FROM accounts WHERE id = ?", [
 		id,
