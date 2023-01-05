@@ -8,7 +8,8 @@
 <body>
     <div>
         <a href="/">Home</a>
-        <a href="/stat">Statistics</a>
+        <a href="/sched">Schedule</a>
+        <a href="/edit">Donors</a>
     </div>
     <form action="/add" method="POST">
         <h1>New Donation Entry</h1>
@@ -22,6 +23,8 @@
         <input type="text" name="address" placeholder="Address + City + ZIP" />
         <input type="text" name="preferredContactMethod" placeholder="Preferred Contact Method" />
         <p></p>
+        <input type="number" name="frequency" placeholder="Donation Frequency" required/>
+        <p></p>
         <i>Note: If there is a donor with the email (supplied above) in the database, then the new donation's donor will
             be linked to the existing donor with that email address, and a new donor will not be created with the rest
             of the fields above.</i>
@@ -32,10 +35,10 @@
         <input type="text" name="paymentMethod" placeholder="Payment Method" />
         <input type="text" name="paymentDetails" placeholder="Payment Details" />
         <p></p>
-        <label for="paymentDate">Date</label>
+        <label for="paymentDate">Donation Date</label>
         <input type="date" id="paymentDate" name="paymentDate" required>
         <p></p>
-        <label for="paymentTime">Time</label>
+        <label for="paymentTime">Donation Time</label>
         <input type="time" id="paymentTime" name="paymentTime" required>
 
 

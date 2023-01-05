@@ -38,6 +38,7 @@ const createDonation = async (req, res) => {
 				phone: req.body.phone,
 				address: req.body.address,
 				preferredContactMethod: req.body.preferredContactMethod,
+				frequency: req.body.frequency
 			});
 	}
 
@@ -58,21 +59,6 @@ const createDonation = async (req, res) => {
 		});
 
 	/* Is this needed? */
-	res.redirect("/");
-};
-
-const editDonation = async (req, res) => {
-	const { id } = req.params;
-	const [result] = await pool.query("SELECT * FROM customer WHERE id = ?", [
-		id,
-	]);
-	res.render("customers_edit", { customer: result[0] });
-};
-
-const updateDonation = async (req, res) => {
-	const { id } = req.params;
-	const newCustomer = req.body;
-	await pool.query("UPDATE customer set ? WHERE id = ?", [newCustomer, id]);
 	res.redirect("/");
 };
 
@@ -131,21 +117,34 @@ app.post('/auth', function (request, response) {
 	});
 });
 
-app.get('/stat', function (request, response) {
-	// If the user is loggedin
-	if (!request.session.loggedin) {
-		response.sendFile(path.join(__dirname + '/login.html'));
-		return;
-	}
-
-	response.sendFile(path.join(__dirname + '/stat.html'));
-});
-
 /* "miniapp" for routing with adding, editing, and deleting customers. */
 const customerRoutes = Router();
 app.use(customerRoutes);
 
+const renderDonors = async (req, res) => {
+	const [rows] = await pool.query("SELECT * FROM donors");
+	res.render("stat", { donors: rows });
+};
+
+const editDonor = async (req, res) => {
+	const { id } = req.params;
+	const [result] = await pool.query("SELECT * FROM donors WHERE id = ?", [
+		id,
+	]);
+	res.render("customers_edit", { donor: result[0] });
+};
+
+const updateDonor = async (req, res) => {
+	const { id } = req.params;
+	const newDonor = req.body;
+	await pool.query("UPDATE donors set ? WHERE id = ?", [newDonor, id]);
+	res.redirect("/edit");
+};
+
+customerRoutes.get("/edit", renderDonors);
 customerRoutes.post("/add", createDonation);
+customerRoutes.get("/update/:id", editDonor);
+customerRoutes.post("/update/:id", updateDonor);
 
 // Port to run server on.
 const port = process.env.PORT || 3000;

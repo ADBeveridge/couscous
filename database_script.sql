@@ -49,4 +49,3 @@ create table donations (
 
 -- insert an account by default. every user is an admin, btw. 
 insert into accounts (id, username, password) values (1, 'user', 'user');
-
