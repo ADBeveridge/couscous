@@ -14,30 +14,30 @@ create table accounts (
 create table donationorganization (
   id int auto_increment primary key,
   name varchar(255),
-  governmentid blob
+  governmentId blob
 );
 
 create table donors (
   id int auto_increment primary key,
-  firstname varchar(255),
-  lastname varchar(255),
+  fname varchar(255),
+  lname varchar(255),
   email varchar(255),
   address varchar(255),
-  preferredcontactmethod varchar(255),
-  contactnotes varchar(255),
+  preferredContactMethod varchar(255),
+  contactNotes varchar(255),
   frequency int,
-  lastpaymentdate date, 
-  lastpaymenttime time
+  lastPaymentDate date, 
+  lastPaymentTime time
 );
 
 create table donations (
   id int auto_increment primary key,
-  paymentamount double,
-  paymenttype varchar(255),
-  paymentdate date, 
-  paymenttime time,
-  paymentmedthod varchar(255),
-  paymentdetails varchar(510),
+  paymentAmount double,
+  paymentType varchar(255),
+  paymentDate date, 
+  paymentTime time,
+  paymentMethod varchar(255),
+  paymentDetails varchar(510),
   creator int,
   donor int,
   foreign key (creator) references accounts(id),
