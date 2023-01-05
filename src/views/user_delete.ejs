@@ -12,13 +12,15 @@
   <!-- navigation -->
   <%- include("partials/navbar") %>
 
-    <div class="container mt-5">
-      <div class="row">
-        <div class="col-md-5 offset-md-3 card bg-dark">
+    <h2 class="centert">Delete <%= user.email %>?</h2>
+
+    <div class="outside">
+      <div class="inside">
+        <div class="card bg-light">
           <div class="card-body">
             <form action="/deleteuser/<%= user.id %>" method="POST">
-              <button type="submit" class="btn btn-primary">Delete</button>
-              <a href="/users" class="btn btn-primary">Cancel</a>
+              <button type="submit" class="btn btn-danger">Delete</button>
+              <a href="/users" class="btn btn-info">Cancel</a>
             </form>
           </div>
         </div>
