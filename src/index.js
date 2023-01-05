@@ -44,8 +44,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 /* The first called function, just reroutes to auth or customers. */
 app.get('/', async (request, response) => {
-	if (!check(request, response)) {return;};
-	
+	if (!check(request, response)) { return; };
+
 	/** Render schedule. */
 	/* Get a customers last donation, and coupled with his given donation frequency, calculate if he needs to donate today. */
 	var renderContents = [];
@@ -68,23 +68,23 @@ app.get('/', async (request, response) => {
 		}
 	}
 
-	response.render("sched", { donations: renderContents });
+	response.render("sched", { donations: renderContents, info: request.session });
 
 });
 
 /** Login and logout. */
 app.post('/auth', function (request, response) {
 	// Capture the input fields
-	let username = request.body.username;
+	let email = request.body.email;
 	let password = request.body.password;
 
-	if (!username || !password) {
+	if (!email || !password) {
 		response.send('Please enter Username and Password!');
 		return;
 	}
 
 	// Execute SQL query that'll select the account from the database based on the specified username and password
-	connection.query('SELECT * FROM accounts WHERE email = ? AND password = ?', [username, password], function (error, results, fields) {
+	connection.query('SELECT * FROM accounts WHERE email = ? AND password = ?', [email, password], function (error, results, fields) {
 		// If there is an issue with the query, output the error
 		if (error) throw error;
 		// If the account exists
@@ -94,16 +94,19 @@ app.post('/auth', function (request, response) {
 		}
 		// Authenticate the user
 		request.session.loggedin = true;
-		request.session.username = username;
-		request.session.userid = results[0].id;
+		request.session.email = email;
+		request.session.isAdmin = false;
+		if (results[0].status == "administrator")
+			request.session.isAdmin = true;
+
 		response.redirect('/');
 	});
 });
 app.get('/logout', function (request, response) {
 	// Authenticate the user
 	request.session.loggedin = false;
-	request.session.username = null;
-	request.session.userid = null;
+	request.session.email = null;
+	request.session.isAdmin = false;
 	response.redirect('/');
 });
 
@@ -128,6 +131,7 @@ app.post("/add", async (req, res) => {
 
 	/* If the donor specified has not been created, then create him here. */
 	if (data.length === 0) {
+		console.log("Creating a new donor...");
 		await pool.query('INSERT INTO donors SET ?',
 			{
 				fname: req.body.fname,
@@ -164,32 +168,32 @@ app.post("/add", async (req, res) => {
 	res.redirect("/createdonation");
 });
 app.get("/donations", async (req, res) => {
-	if (!check(req, res)) {return;};
+	if (!check(req, res)) { return; };
 	const [rows] = await pool.query("SELECT * FROM donations");
 	const [rows2] = await pool.query("SELECT * FROM donors");
-	res.render("donations", {donations: rows, donors: rows2});
+	res.render("donations", { donations: rows, donors: rows2, info: req.session });
 });
 
 
 /** Schedule */
 app.get("/createdonation", async (req, res) => {
-	if (!check(req, res)) {return;};
-	res.render("donation_create");
+	if (!check(req, res)) { return; };
+	res.render("donation_create", { info: req.session });
 });
 
 /** Donor managment. Does not create donor as donation creation does that. */
 app.get("/donors", async (req, res) => {
-	if (!check(req, res)) {return;};
+	if (!check(req, res)) { return; };
 	const [rows] = await pool.query("SELECT * FROM donors");
-	res.render("donors", { donors: rows });
+	res.render("donors", { donors: rows, info: req.session });
 });
 app.get("/update/:id", async (req, res) => {
-	if (!check(req, res)) {return;};
+	if (!check(req, res)) { return; };
 	const { id } = req.params;
 	const [result] = await pool.query("SELECT * FROM donors WHERE id = ?", [
 		id,
 	]);
-	res.render("donor_edit", { donor: result[0] });
+	res.render("donor_edit", { donor: result[0], info: req.session });
 });
 app.post("/update/:id", async (req, res) => {
 	const { id } = req.params;
@@ -198,12 +202,12 @@ app.post("/update/:id", async (req, res) => {
 	res.redirect("/donors");
 });
 app.get("/delete/:id", async (req, res) => {
-	if (!check(req, res)) {return;};
+	if (!check(req, res)) { return; };
 	const { id } = req.params;
 	const [result] = await pool.query("SELECT * FROM donors WHERE id = ?", [
 		id,
 	]);
-	res.render("donor_delete", { donor: result[0] });
+	res.render("donor_delete", { donor: result[0], info: req.session });
 });
 app.post("/delete/:id", async (req, res) => {
 	const { id } = req.params;
@@ -214,9 +218,10 @@ app.post("/delete/:id", async (req, res) => {
 
 /** User management. */
 app.get("/users", async (req, res) => {
-	if (!check(req, res)) {return;};
+	if (!check(req, res)) { return; };
+	if (req.session.isAdmin == false) { res.sendStatus(404); return; }
 	const [result] = await pool.query("SELECT * FROM accounts WHERE status is NULL && hidden = 0");
-	res.render("users", { users: result });
+	res.render("users", { users: result, info: req.session });
 });
 app.post("/adduser", async (req, res) => {
 	const newUser = req.body;
@@ -225,12 +230,13 @@ app.post("/adduser", async (req, res) => {
 	res.redirect("/users");
 });
 app.get("/updateuser/:id", async (req, res) => {
-	if (!check(req, res)) {return;};
+	if (!check(req, res)) { return; };
+	if (req.session.isAdmin == false) { res.sendStatus(404); return; }
 	const { id } = req.params;
 	const [result] = await pool.query("SELECT * FROM accounts where id = ?", [
 		id,
 	]);
-	res.render("user_edit", { user: result[0] });
+	res.render("user_edit", { user: result[0], info: req.session });
 });
 app.post("/updateuser/:id", async (req, res) => {
 	const { id } = req.params;
@@ -239,18 +245,24 @@ app.post("/updateuser/:id", async (req, res) => {
 	res.redirect("/users");
 });
 app.get("/deleteuser/:id", async (req, res) => {
-	if (!check(req, res)) {return;};
+	if (!check(req, res)) { return; };
+	if (req.session.isAdmin == false) { res.sendStatus(404); return; }
 	const { id } = req.params;
 	const [result] = await pool.query("SELECT * FROM accounts WHERE id = ?", [
 		id,
 	]);
-	res.render("user_delete", { user: result[0] });
+	res.render("user_delete", { user: result[0], info: req.session });
 });
 app.post("/deleteuser/:id", async (req, res) => {
 	const { id } = req.params;
 	await pool.query("UPDATE accounts set hidden = 1 WHERE id = ?", [id]);
 	res.redirect("/users");
 });
+
+/* 404 handler. */
+app.use((req, res, next) => {
+    res.sendStatus(404);
+})
 
 // Port to run server on.
 const port = process.env.PORT || 3000;

@@ -4,7 +4,9 @@
     <a class="" href="/createdonation">Create Donation</a>
     <a class="" href="/donations">Donations</a>
     <a class="" href="/donors">Donors</a>
+    <% if(info.isAdmin == true) { %>
     <a class="" href="/users">Management</a>
+    <% } %>
     <a class="" href="/logout">Logout</a>
   </div>
 </nav>
