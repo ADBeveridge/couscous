@@ -39,6 +39,8 @@ create table donations (
   paymentTime time,
   paymentMethod varchar(255),
   paymentDetails varchar(510),
+  inputDate date, 
+  inputTime time,
   creator int,
   donor int,
   foreign key (creator) references accounts(id),
