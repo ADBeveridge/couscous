@@ -17,11 +17,9 @@
         <div class="col-md-5 offset-md-3 card bg-dark">
           <div class="card-body">
             <form action="/updateuser/<%= user.id %>" method="POST">
-              <input type="text" name="username" value="<%= user.username %>" placeholder="User Name"
-                class="form-control mb-3" autofocus />
+              <input type="text" name="email" value="<%= user.email%>" placeholder="Email" class="form-control mb-3" />
               <input type="password" name="password" value="<%= user.password %>" placeholder="Password"
                 class="form-control mb-3" />
-              <input type="text" name="email" value="<%= user.email%>" placeholder="Email" class="form-control mb-3" />
               
               <button type="submit" class="btn btn-primary">Save User</button>
               <a href="/users" class="btn btn-primary">Cancel</a>

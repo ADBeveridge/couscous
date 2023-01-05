@@ -84,7 +84,7 @@ app.post('/auth', function (request, response) {
 	}
 
 	// Execute SQL query that'll select the account from the database based on the specified username and password
-	connection.query('SELECT * FROM accounts WHERE username = ? AND password = ?', [username, password], function (error, results, fields) {
+	connection.query('SELECT * FROM accounts WHERE email = ? AND password = ?', [username, password], function (error, results, fields) {
 		// If there is an issue with the query, output the error
 		if (error) throw error;
 		// If the account exists
@@ -161,9 +161,10 @@ app.post("/add", async (req, res) => {
 	await pool.query('UPDATE donors SET lastPaymentDateTime = ? WHERE id = ?', [donations[0].paymentDateTime, rows[0].id]);
 
 	/* Is this needed? */
-	res.redirect("/");
+	res.redirect("/createdonation");
 });
 app.get("/donations", async (req, res) => {
+	if (!check(req, res)) {return;};
 	const [rows] = await pool.query("SELECT * FROM donations");
 	const [rows2] = await pool.query("SELECT * FROM donors");
 	res.render("donations", {donations: rows, donors: rows2});
@@ -172,15 +173,18 @@ app.get("/donations", async (req, res) => {
 
 /** Schedule */
 app.get("/createdonation", async (req, res) => {
+	if (!check(req, res)) {return;};
 	res.render("donation_create");
 });
 
 /** Donor managment. Does not create donor as donation creation does that. */
 app.get("/donors", async (req, res) => {
+	if (!check(req, res)) {return;};
 	const [rows] = await pool.query("SELECT * FROM donors");
 	res.render("donors", { donors: rows });
 });
 app.get("/update/:id", async (req, res) => {
+	if (!check(req, res)) {return;};
 	const { id } = req.params;
 	const [result] = await pool.query("SELECT * FROM donors WHERE id = ?", [
 		id,
@@ -194,6 +198,7 @@ app.post("/update/:id", async (req, res) => {
 	res.redirect("/donors");
 });
 app.get("/delete/:id", async (req, res) => {
+	if (!check(req, res)) {return;};
 	const { id } = req.params;
 	const [result] = await pool.query("SELECT * FROM donors WHERE id = ?", [
 		id,
@@ -210,11 +215,12 @@ app.post("/delete/:id", async (req, res) => {
 /** User management. */
 app.get("/users", async (req, res) => {
 	if (!check(req, res)) {return;};
-	const [result] = await pool.query("SELECT * FROM accounts WHERE status is NULL");
+	const [result] = await pool.query("SELECT * FROM accounts WHERE status is NULL && hidden = 0");
 	res.render("users", { users: result });
 });
 app.post("/adduser", async (req, res) => {
 	const newUser = req.body;
+	newUser["hidden"] = 0;
 	await pool.query("INSERT INTO accounts set ?", [newUser]);
 	res.redirect("/users");
 });
@@ -242,10 +248,9 @@ app.get("/deleteuser/:id", async (req, res) => {
 });
 app.post("/deleteuser/:id", async (req, res) => {
 	const { id } = req.params;
-	await pool.query("DELETE FROM accounts WHERE id = ?", [id]);
+	await pool.query("UPDATE accounts set hidden = 1 WHERE id = ?", [id]);
 	res.redirect("/users");
 });
-
 
 // Port to run server on.
 const port = process.env.PORT || 3000;
