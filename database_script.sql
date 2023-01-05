@@ -22,6 +22,7 @@ create table donors (
   fname varchar(255),
   lname varchar(255),
   email varchar(255),
+  phone varchar(255),
   address varchar(255),
   preferredContactMethod varchar(255),
   contactNotes varchar(255),
