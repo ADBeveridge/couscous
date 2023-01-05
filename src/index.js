@@ -8,7 +8,7 @@ import { createPool } from "mysql2/promise";
 import mysql from "mysql";
 import { request } from "http";
 
-// Used by login system
+// Used by login system.
 const connection = mysql.createConnection({
 	host: 'localhost',
 	user: 'root',
@@ -23,12 +23,7 @@ const pool = createPool({
 	password: "WwlzJ9gIVXQe",
 	database: "customersdb",
 });
-/*
-const addDonor = async (req, res) => {
-	const [rows] = await pool.query("SELECT * FROM customer");
-};
-  
-*/
+
 const createDonation = async (req, res) => {
 	/* See if the donor has already donated to the organization. Identifed only by email. */
 	const [data] = await pool.query('SELECT * FROM donors WHERE email = ?', [req.body.email]);
@@ -106,7 +101,6 @@ app.get('/', function (request, response) {
 		return;
 	}
 	response.redirect('/customers');
-	console.log("Called!");
 	response.end();
 });
 
