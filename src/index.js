@@ -7,6 +7,7 @@ import { Router } from "express";
 import { createPool } from "mysql2/promise";
 import mysql from "mysql";
 import { request } from "http";
+import { channel } from "diagnostics_channel";
 
 // Used by login system.
 const connection = mysql.createConnection({
@@ -90,7 +91,7 @@ app.get('/', function (request, response) {
 		response.sendFile(path.join(__dirname + '/login.html'));
 		return;
 	}
-	response.sendFile(path.join(__dirname + '/home.html'));
+	response.render("home");
 });
 
 /* This function is called by the action name in the html file. */
@@ -137,9 +138,12 @@ function sameDay(d1, d2) {
 		d1.getDate() === d2.getDate();
 }
 
-/* "miniapp" for routing with adding, editing, and deleting customers. */
-const customerRoutes = Router();
-app.use(customerRoutes);
+function check(request, res) {
+	if (!request.session.loggedin) {
+		console.log("HIII" + request.session.loggedin);
+		res.redirect("/");
+	}
+}
 
 const renderDonors = async (req, res) => {
 	const [rows] = await pool.query("SELECT * FROM donors");
@@ -202,19 +206,56 @@ const renderSched = async (req, res) => {
 	res.render("sched", { donations: renderContents });
 };
 
-const userManagement = async (req, res) => {
-	const [result] = await pool.query("SELECT * FROM accounts");
-	res.render("user_management", { users: result });
-};
+app.get("/edit", renderDonors);
+app.post("/add", createDonation);
+app.get("/update/:id", editDonor);
+app.post("/update/:id", updateDonor);
+app.get("/delete/:id", askDelete);
+app.post("/delete/:id", deleteCustomer);
+app.get("/sched", renderSched);
 
-customerRoutes.get("/edit", renderDonors);
-customerRoutes.post("/add", createDonation);
-customerRoutes.get("/update/:id", editDonor);
-customerRoutes.post("/update/:id", updateDonor);
-customerRoutes.get("/delete/:id", askDelete);
-customerRoutes.post("/delete/:id", deleteCustomer);
-customerRoutes.get("/sched", renderSched);
-customerRoutes.get("/users", userManagement);
+app.get("/users", async (req, res) => {
+	check(req, res);
+	const [result] = await pool.query("SELECT * FROM accounts WHERE status is NULL");
+	res.render("user_management", { users: result });
+});
+
+/** Update User */
+app.get("/updateuser/:id", async (req, res) => {
+	const { id } = req.params;
+	const [result] = await pool.query("SELECT * FROM accounts where id = ?", [
+		id,
+	]);
+	res.render("user_edit", { user: result[0] });
+});
+app.post("/updateuser/:id", async (req, res) => {
+	const { id } = req.params;
+	const newuser = req.body;
+	await pool.query("UPDATE accounts set ? WHERE id = ?", [newuser, id]);
+	res.redirect("/users");
+});
+
+/** Delete User */
+app.get("/deleteuser/:id", async (req, res) => {
+	const { id } = req.params;
+	const [result] = await pool.query("SELECT * FROM accounts WHERE id = ?", [
+		id,
+	]);
+	res.render("delete_user", { user: result[0] });
+});
+
+app.post("/deleteuser/:id", async (req, res) => {
+	const { id } = req.params;
+	await pool.query("DELETE FROM accounts WHERE id = ?", [id]);
+	res.redirect("/users");
+});
+
+/** Add user */
+app.post("/adduser", async (req, res) => {
+	const newUser = req.body;
+	await pool.query("INSERT INTO accounts set ?", [newUser]);
+	res.redirect("/users");
+});
 
 // Port to run server on.
 const port = process.env.PORT || 3000;

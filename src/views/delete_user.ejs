@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Donors</title>
+  <link rel="stylesheet" href="https://bootswatch.com/5/lux/bootstrap.min.css">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+  <!-- navigation -->
+  <%- include("partials/navbar") %>
+
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-md-5 offset-md-3 card bg-dark">
+          <div class="card-body">
+            <form action="/deleteuser/<%= user.id %>" method="POST">
+              <button type="submit" class="btn btn-primary">Delete</button>
+              <a href="/users" class="btn btn-primary">Cancel</a>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</body>
+
+</html>

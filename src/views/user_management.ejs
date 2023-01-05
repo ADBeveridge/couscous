@@ -14,34 +14,71 @@
     <!-- Data rendering -->
     <div class="container mt-5">
       <div class="row">
-        <div class="col-md-7">
-          <table class="table table-dark table-bordered table-hover">
-            <thead>
-              <tr>
-                <td>Id</td>
-                <td>User Name</td>
-                <td>Email</td>
-              </tr>
-            </thead>
-            <tbody>
-              <% if (users) { %>
-                <% for(var i=0; i < users.length; i++) {%>
+        <div class="outside">
+          <div class="inside">
+            <div class="col-md-7">
+              <table class="table table-dark table-bordered table-hover">
+                <thead>
                   <tr>
-                    <td>
-                      <%= users[i].id %>
-                    </td>
-                    <td>
-                      <%= users[i].username %>
-                    </td>
-                    <td>
-                      <%= users[i].email %>
-                    </td>
+                    <td>Id</td>
+                    <td>User Name</td>
+                    <td>Email</td>
+                    <td>Actions</td>
                   </tr>
-                  <% } %>
-                    <% } %>
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  <% if (users) { %>
+                    <% for(var i=0; i < users.length; i++) {%>
+                      <tr>
+                        <td>
+                          <%= users[i].id %>
+                        </td>
+                        <td>
+                          <%= users[i].username %>
+                        </td>
+                        <td>
+                          <%= users[i].email %>
+                        </td>
+                        <td>
+                          <a href="/updateuser/<%= users[i].id %>" class="btn btn-primary">Edit User</a>
+                          <a href="/deleteuser/<%= users[i].id %>" class="btn btn-primary">Delete User</a>
+                        </td>
+                      </tr>
+                          
+                      <% } %>
+                        <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card-body">
+        <form action="/adduser" method="POST">
+          <input
+            type="text"
+            name="username"
+            placeholder="User Name"
+            class="form-control mb-2"
+            autofocus
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            class="form-control mb-2"
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            class="form-control mb-2"
+          />
+
+          <button type="submit" class="btn btn-info">Add User</button>
+        </form>
       </div>
     </div>
 
