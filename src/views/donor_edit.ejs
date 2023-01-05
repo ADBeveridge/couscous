@@ -22,6 +22,13 @@
           />
           <input
             type="text"
+            name="email"
+            value="<%= donor.email%>"
+            placeholder="Email"
+            class="form-control mb-3"
+          />
+          <input
+            type="text"
             name="address"
             value="<%= donor.address%>"
             placeholder="Address"
@@ -34,8 +41,15 @@
             placeholder="Phone"
             class="form-control mb-3"
           />
-
+          <input
+            type="number"
+            name="frequency"
+            value="<%= donor.frequency%>"
+            placeholder="Donation Frequency"
+            class="form-control mb-3"
+          />
           <button type="submit" class="btn btn-primary">save donor</button>
+          <a href="/edit" class="btn btn-primary">Cancel</a>
         </form>
       </div>
     </div>

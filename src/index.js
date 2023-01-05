@@ -123,7 +123,7 @@ app.use(customerRoutes);
 
 const renderDonors = async (req, res) => {
 	const [rows] = await pool.query("SELECT * FROM donors");
-	res.render("stat", { donors: rows });
+	res.render("donor_management", { donors: rows });
 };
 
 const editDonor = async (req, res) => {
@@ -131,7 +131,7 @@ const editDonor = async (req, res) => {
 	const [result] = await pool.query("SELECT * FROM donors WHERE id = ?", [
 		id,
 	]);
-	res.render("customers_edit", { donor: result[0] });
+	res.render("donor_edit", { donor: result[0] });
 };
 
 const updateDonor = async (req, res) => {
