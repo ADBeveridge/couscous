@@ -182,11 +182,6 @@ app.get("/createdonation", async (req, res) => {
 });
 
 /** Donor managment. Does not create donor as donation creation does that. */
-app.get("/donors", async (req, res) => {
-	if (!check(req, res)) { return; };
-	const [rows] = await pool.query("SELECT * FROM donors");
-	res.render("donors", { donors: rows, info: req.session });
-});
 app.get("/update/:id", async (req, res) => {
 	if (!check(req, res)) { return; };
 	const { id } = req.params;
@@ -199,7 +194,7 @@ app.post("/update/:id", async (req, res) => {
 	const { id } = req.params;
 	const newDonor = req.body;
 	await pool.query("UPDATE donors set ? WHERE id = ?", [newDonor, id]);
-	res.redirect("/donors");
+	res.redirect("/users");
 });
 app.get("/delete/:id", async (req, res) => {
 	if (!check(req, res)) { return; };
@@ -213,7 +208,7 @@ app.post("/delete/:id", async (req, res) => {
 	const { id } = req.params;
 	await pool.query("DELETE FROM donations WHERE donor = ?", [id]);
 	await pool.query("DELETE FROM donors WHERE id = ?", [id]);
-	res.redirect("/donors");
+	res.redirect("/users");
 });
 
 /** User management. */
@@ -221,7 +216,8 @@ app.get("/users", async (req, res) => {
 	if (!check(req, res)) { return; };
 	if (req.session.isAdmin == false) { res.sendStatus(404); return; }
 	const [result] = await pool.query("SELECT * FROM accounts WHERE status is NULL && hidden = 0");
-	res.render("users", { users: result, info: req.session });
+	const [rows] = await pool.query("SELECT * FROM donors");
+	res.render("users", { users: result, info: req.session, donors: rows });
 });
 app.post("/adduser", async (req, res) => {
 	const newUser = req.body;
