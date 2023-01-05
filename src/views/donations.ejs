@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Donations</title>
+  <link rel="stylesheet" href="https://bootswatch.com/5/lux/bootstrap.min.css">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+  <%- include("partials/navbar") %>
+
+  <h2 class="centert">Donations</h2>
+
+  <!-- Data rendering -->
+  <div class="outside">
+    <div class="inside">
+      <table class="table table-light table-bordered table-hover">
+        <thead>
+          <tr>
+            <td>Donor</td>
+            <td>Amount</td>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (donations) { %>
+          <% for(var i=0; i < donations.length; i++) {%>
+          <tr>
+            <td>
+              <!-- Find the donors email. -->
+              <% for(var x=0; x < donors.length; x++){ %>
+                <% if (donors[x].id == donations[i].donor) { %>
+              <%= donors[x].email %>
+              <% } %>
+              <% } %>
+            </td>
+            <td>
+              <%= '$' + donations[i].paymentAmount.toFixed(2) %>
+            </td>
+          </tr>
+          <% } %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</body>
+
+</html>

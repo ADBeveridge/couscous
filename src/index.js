@@ -163,17 +163,22 @@ app.post("/add", async (req, res) => {
 	/* Is this needed? */
 	res.redirect("/");
 });
+app.get("/donations", async (req, res) => {
+	const [rows] = await pool.query("SELECT * FROM donations");
+	const [rows2] = await pool.query("SELECT * FROM donors");
+	res.render("donations", {donations: rows, donors: rows2});
+});
 
 
 /** Schedule */
-app.get("/donations", async (req, res) => {
-	res.render("home");
+app.get("/createdonation", async (req, res) => {
+	res.render("donation_create");
 });
 
 /** Donor managment. Does not create donor as donation creation does that. */
 app.get("/donors", async (req, res) => {
 	const [rows] = await pool.query("SELECT * FROM donors");
-	res.render("donor_management", { donors: rows });
+	res.render("donors", { donors: rows });
 });
 app.get("/update/:id", async (req, res) => {
 	const { id } = req.params;
@@ -206,7 +211,7 @@ app.post("/delete/:id", async (req, res) => {
 app.get("/users", async (req, res) => {
 	if (!check(req, res)) {return;};
 	const [result] = await pool.query("SELECT * FROM accounts WHERE status is NULL");
-	res.render("user_management", { users: result });
+	res.render("users", { users: result });
 });
 app.post("/adduser", async (req, res) => {
 	const newUser = req.body;
