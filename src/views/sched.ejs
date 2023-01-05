@@ -9,54 +9,49 @@
 </head>
 
 <body>
-  <!-- Navigation bar -->
-  <nav class="navbar navbar-light bg-light">
-    <div class="container">
-      <a class="" href="/">Home</a>
-      <a class="" href="/sched">Schedule</a>
-      <a class="" href="/edit">Donors</a>
-      <a class="" href="/logout">Logout</a>
-    </div>
-  </nav>
+  <%- include("partials/navbar") %>
 
-  <h2 class="centert">Donors Due Today</h2>
+    <h2 class="centert">Donors Due Today</h2>
+    <% if (donations.length> 0) { %>
 
-  <div class="container mt-5">
-    <div class="row">
-      <div class="col-md-7">
-        <table class="table table-dark table-bordered table-hover">
-          <thead>
-            <tr>
-              <td>Name</td>
-              <td>Email</td>
-              <td>Phone</td>
-              <td>Address</td>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (donations) { %>
-              <% for(var i=0; i < donations.length; i++) {%>
+      <div class="container mt-5">
+        <div class="row">
+          <div class="col-md-7">
+            <table class="table table-dark table-bordered table-hover">
+              <thead>
                 <tr>
-                  <td>
-                    <%= donations[i].fname + ' ' + donations[i].lname %>
-                  </td>
-                  <td>
-                    <%= donations[i].email %>
-                  </td>
-                  <td>
-                    <%= donations[i].phone %>
-                  </td>
-                  <td>
-                    <%= donations[i].address %>
-                  </td>
+                  <td>Name</td>
+                  <td>Email</td>
+                  <td>Phone</td>
+                  <td>Address</td>
                 </tr>
-                <% } %>
+              </thead>
+              <tbody>
+                <% for(var i=0; i < donations.length; i++) {%>
+                  <tr>
+                    <td>
+                      <%= donations[i].fname + ' ' + donations[i].lname %>
+                    </td>
+                    <td>
+                      <%= donations[i].email %>
+                    </td>
+                    <td>
+                      <%= donations[i].phone %>
+                    </td>
+                    <td>
+                      <%= donations[i].address %>
+                    </td>
+                  </tr>
                   <% } %>
-          </tbody>
-        </table>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+      <% } else {%>
+        <p class="centert">You are all caught up for today!</p>
+        <% } %>
 </body>
 
 </html>

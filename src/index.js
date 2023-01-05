@@ -126,7 +126,7 @@ app.get('/logout', function (request, response) {
 	// Authenticate the user
 	request.session.loggedin = false;
 	request.session.username = null;
-	request.session.userid =  null;
+	request.session.userid = null;
 	response.redirect('/');
 });
 
@@ -202,6 +202,11 @@ const renderSched = async (req, res) => {
 	res.render("sched", { donations: renderContents });
 };
 
+const userManagement = async (req, res) => {
+	const [result] = await pool.query("SELECT * FROM accounts");
+	res.render("user_management", { users: result });
+};
+
 customerRoutes.get("/edit", renderDonors);
 customerRoutes.post("/add", createDonation);
 customerRoutes.get("/update/:id", editDonor);
@@ -209,6 +214,7 @@ customerRoutes.post("/update/:id", updateDonor);
 customerRoutes.get("/delete/:id", askDelete);
 customerRoutes.post("/delete/:id", deleteCustomer);
 customerRoutes.get("/sched", renderSched);
+customerRoutes.get("/users", userManagement);
 
 // Port to run server on.
 const port = process.env.PORT || 3000;
