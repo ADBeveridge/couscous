@@ -2,46 +2,84 @@
 <html>
 
 <head>
-    <title>Home</title>
+  <meta charset="UTF-8" />
+  <title>Home</title>
+  <link rel="stylesheet" href="https://bootswatch.com/5/lux/bootstrap.min.css">
+  <link rel="stylesheet" href="/style.css" />
 </head>
 
 <body>
-    <div>
-        <a href="/">Home</a>
-        <a href="/sched">Schedule</a>
-        <a href="/edit">Donors</a>
+  <!-- navigation -->
+  <nav class="navbar navbar-light bg-light">
+    <div class="container">
+      <a class="" href="/">Home</a>
+      <a class="" href="/sched">Schedule</a>
+      <a class="" href="/edit">Donors</a>
+      <a class="" href="/logout">Logout</a>
     </div>
-    <form action="/add" method="POST">
-        <h1>New Donation Entry</h1>
-        <h2>Donor Info</h2>
-        <input type="text" name="fname" placeholder="First Name" autofocus />
-        <input type="text" name="lname" placeholder="Last Name" />
+  </nav>
+
+  <h2 class="centert">New Donation Entry</h2>
+
+  <div class="outside">
+    <div class="inside">
+      <form action="/add" method="POST" class="inputform">
+        <hr>
+        <div class="form-group">
+          <h3 class="centert">Donor Info</h3>
+          <label for="fname" class="sr-only">First Name</label>
+          <input type="text" name="fname" id="fname" placeholder="First Name" autofocus class="form-control mb-2" />
+
+          <label for="lname" class="sr-only">Last Name</label>
+          <input type="text" id="lname" name="lname" placeholder="Last Name" class="form-control mb-2" />
+
+          <label for="email" class="sr-only">Email</label>
+          <input type="email" id="email" name="email" placeholder="Email" required class="form-control mb-2" />
+
+          <label for="phone" class="sr-only">Phone</label>
+          <input type="text" id="phone" name="phone" placeholder="Phone Number" class="form-control mb-2" />
+
+          <label for="address" class="sr-only">Address</label>
+          <input type="text" id="address" name="address" placeholder="Address + City + ZIP" class="form-control mb-2" />
+
+          <label for="preferredContactMethod" class="sr-only">Preferred Contact Method</label>
+          <input type="text" id="preferredContactMethod" name="preferredContactMethod"
+            placeholder="Preferred Contact Method" class="form-control mb-2" />
+
+          <label for="frequency" class="sr-only">Frequency</label>
+          <input type="number" id="frequency" name="frequency" placeholder="Donation Frequency" required
+            class="form-control mb-2" />
+
+        </div>
         <p></p>
-        <input type="email" name="email" placeholder="Email" required />
-        <input type="text" name="phone" placeholder="Phone Number" />
-        <p></p>
-        <input type="text" name="address" placeholder="Address + City + ZIP" />
-        <input type="text" name="preferredContactMethod" placeholder="Preferred Contact Method" />
-        <p></p>
-        <input type="number" name="frequency" placeholder="Donation Frequency" required/>
-        <p></p>
-        <i>Note: If there is a donor with the email (supplied above) in the database, then the new donation's donor will
-            be linked to the existing donor with that email address, and a new donor will not be created with the rest
-            of the fields above.</i>
-        <h2>Donation Info</h2>
-        <input type="number" name="paymentAmount" placeholder="Amount" step="0.01" required />
-        <input type="text" name="paymentType" placeholder="Payment Type" />
-        <p></p>
-        <input type="text" name="paymentMethod" placeholder="Payment Method" />
-        <input type="text" name="paymentDetails" placeholder="Payment Details" />
-        <p></p>
-        <label for="paymentDateTime">Donation Date & Time</label>
-        <input type="datetime-local" id="paymentDateTime" name="paymentDateTime" required>
+        <div class="form-group">
+          <h3 class="centert">Donation Info</h3>
+          <label for="paymentAmount" class="sr-only">Payment Amount</label>
+          <input type="number" id="paymentAmount" name="paymentAmount" placeholder="Amount" step="0.01" required
+            class="form-control mb-2" />
+
+          <label for="paymentType" class="sr-only">Payment Type</label>
+          <input type="text" id="paymentType" name="paymentType" placeholder="Payment Type" class="form-control mb-2" />
+
+          <label for="paymentMethod" class="sr-only">Payment Method</label>
+          <input type="text" id="paymentMethod" name="paymentMethod" placeholder="Payment Method"
+            class="form-control mb-2" />
+
+          <label for="paymentDetails" class="sr-only">Payment Details</label>
+          <input type="text" id="paymentDetails" name="paymentDetails" placeholder="Payment Details"
+            class="form-control mb-2" />
+
+          <label for="paymentDateTime" class="sr-only">Donation Date & Time</label>
+          <input type="datetime-local" id="paymentDateTime" name="paymentDateTime" required class="form-control mb-2">
 
 
-        <p></p>
-        <button type="submit">Add Donation</button>
-    </form>
+          <p></p>
+          <button type="submit" class="btn btn-primary">Add Donation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </body>
 
 </html>

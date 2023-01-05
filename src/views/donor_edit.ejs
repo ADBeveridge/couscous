@@ -1,59 +1,47 @@
-<%- include("partials/_header") %>
+<!DOCTYPE html>
+<html lang="en">
 
-<div class="container mt-5">
-  <div class="row">
-    <div class="col-md-5 offset-md-3 card bg-dark">
-      <div class="card-body">
-        <form action="/update/<%= donor.id %>" method="POST">
-          <input
-            type="text"
-            name="fname"
-            value="<%= donor.fname %>"
-            placeholder="First Name"
-            class="form-control mb-3"
-            autofocus
-          />
-          <input
-            type="text"
-            name="lname"
-            value="<%= donor.lname %>"
-            placeholder="Last Name"
-            class="form-control mb-3"
-          />
-          <input
-            type="text"
-            name="email"
-            value="<%= donor.email%>"
-            placeholder="Email"
-            class="form-control mb-3"
-          />
-          <input
-            type="text"
-            name="address"
-            value="<%= donor.address%>"
-            placeholder="Address"
-            class="form-control mb-3"
-          />
-          <input
-            type="text"
-            name="phone"
-            value="<%= donor.phone%>"
-            placeholder="Phone"
-            class="form-control mb-3"
-          />
-          <input
-            type="number"
-            name="frequency"
-            value="<%= donor.frequency%>"
-            placeholder="Donation Frequency"
-            class="form-control mb-3"
-          />
-          <button type="submit" class="btn btn-primary">save donor</button>
-          <a href="/edit" class="btn btn-primary">Cancel</a>
-        </form>
+<head>
+  <meta charset="UTF-8" />
+  <title>Donors</title>
+  <link rel="stylesheet" href="https://bootswatch.com/5/lux/bootstrap.min.css">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+  <!-- navigation -->
+  <nav class="navbar navbar-light bg-light">
+    <div class="container">
+      <a class="" href="/">Home</a>
+      <a class="" href="/sched">Schedule</a>
+      <a class="" href="/edit">Donors</a>
+      <a class="" href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <!-- Data rendering -->
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-5 offset-md-3 card bg-dark">
+        <div class="card-body">
+          <form action="/update/<%= donor.id %>" method="POST">
+            <input type="text" name="fname" value="<%= donor.fname %>" placeholder="First Name"
+              class="form-control mb-3" autofocus />
+            <input type="text" name="lname" value="<%= donor.lname %>" placeholder="Last Name"
+              class="form-control mb-3" />
+            <input type="text" name="email" value="<%= donor.email%>" placeholder="Email" class="form-control mb-3" />
+            <input type="text" name="address" value="<%= donor.address%>" placeholder="Address"
+              class="form-control mb-3" />
+            <input type="text" name="phone" value="<%= donor.phone%>" placeholder="Phone" class="form-control mb-3" />
+            <input type="number" name="frequency" value="<%= donor.frequency%>" placeholder="Donation Frequency"
+              class="form-control mb-3" />
+            <button type="submit" class="btn btn-primary">save donor</button>
+            <a href="/edit" class="btn btn-primary">Cancel</a>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
+</body>
 
-<%- include("partials/_footer") %>
+</html>

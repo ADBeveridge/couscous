@@ -121,6 +121,16 @@ app.post('/auth', function (request, response) {
 	});
 });
 
+/* The first called function, just reroutes to auth or customers. */
+app.get('/logout', function (request, response) {
+	// Authenticate the user
+	request.session.loggedin = false;
+	request.session.username = null;
+	request.session.userid =  null;
+	response.redirect('/');
+});
+
+
 function sameDay(d1, d2) {
 	return d1.getFullYear() === d2.getFullYear() &&
 		d1.getMonth() === d2.getMonth() &&

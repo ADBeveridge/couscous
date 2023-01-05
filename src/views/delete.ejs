@@ -1,16 +1,37 @@
-<%- include("partials/_header") %>
+<!DOCTYPE html>
+<html lang="en">
 
-<div class="container mt-5">
-  <div class="row">
-    <div class="col-md-5 offset-md-3 card bg-dark">
-      <div class="card-body">
-        <form action="/delete/<%= donor.id %>" method="POST">
-          <button type="submit" class="btn btn-primary">Delete</button>
-          <a href="/edit" class="btn btn-primary">Cancel</a>
-        </form>
+<head>
+  <meta charset="UTF-8" />
+  <title>Donors</title>
+  <link rel="stylesheet" href="https://bootswatch.com/5/lux/bootstrap.min.css">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+  <!-- navigation -->
+  <nav class="navbar navbar-light bg-light">
+    <div class="container">
+      <a class="" href="/">Home</a>
+      <a class="" href="/sched">Schedule</a>
+      <a class="" href="/edit">Donors</a>
+      <a class="" href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-5 offset-md-3 card bg-dark">
+        <div class="card-body">
+          <form action="/delete/<%= donor.id %>" method="POST">
+            <button type="submit" class="btn btn-primary">Delete</button>
+            <a href="/edit" class="btn btn-primary">Cancel</a>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<%- include("partials/_footer") %>
+</body>
+
+</html>
