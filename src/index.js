@@ -8,6 +8,16 @@ import { request } from "http";
 import { channel } from "diagnostics_channel";
 
 import pool from "./database.js";
+
+// Used by login system.
+const connection = mysql.createConnection({
+	host: "awseb-e-aztph9uyyz-stack-awsebrdsdatabase-ta4zdp05fs81.c3kwci5hfksz.us-east-1.rds.amazonaws.com",
+	user: "admin",
+	password: "WwlzJ9gIVXQe",
+	database: "ebdb"
+});
+
+/* Administator urls. */
 import {
 	deleteLuser,
 	renderDeleteLuser,
@@ -15,8 +25,13 @@ import {
 	addLuser,
 	renderUpdateLuser,
 	updateLuser,
+	renderUpdateDonor,
+	updateDonor,
+	renderDeleteDonor,
+	deleteDonor
 } from "./admin.js";
 
+/* Owner urls. */
 import {
 	deleteAdmin,
 	renderDeleteAdmin,
@@ -26,13 +41,12 @@ import {
 	updateAdmin,
 } from "./owner.js";
 
-// Used by login system.
-const connection = mysql.createConnection({
-	host: "awseb-e-aztph9uyyz-stack-awsebrdsdatabase-ta4zdp05fs81.c3kwci5hfksz.us-east-1.rds.amazonaws.com",
-	user: "admin",
-	password: "WwlzJ9gIVXQe",
-	database: "ebdb"
-});
+/* Lusers and Admin's urls. */
+import {
+	addDonation,
+	renderAddDonation,
+	renderDonations,
+} from "./luser_admin.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -127,89 +141,16 @@ function check(request, res) {
 	return 1;
 }
 
-/** Donation managment. */
-app.get("/donations", async (req, res) => {
-	if (!check(req, res)) { return; };
-	const [rows] = await pool.query("SELECT * FROM donations");
-	const [rows2] = await pool.query("SELECT * FROM donors");
-	res.render("donations", { donations: rows, donors: rows2, info: req.session });
-});
-app.get("/createdonation", async (req, res) => {
-	if (!check(req, res)) { return; };
-	res.render("donation_create", { info: req.session });
-});
-app.post("/createdonation", async (req, res) => {
-	/* See if the donor has already donated to the organization. Identifed only by email. */
-	const [data] = await pool.query('SELECT * FROM donors WHERE email = ?', [req.body.email]);
+/** Donation managment. Can be used by both admins and lusers. */
+app.get("/donations", renderDonations);
+app.get("/createdonation", renderAddDonation);
+app.post("/createdonation", addDonation);
 
-	/* If the donor specified has not been created, then create him here. */
-	if (data.length === 0) {
-		console.log("Creating a new donor...");
-		await pool.query('INSERT INTO donors SET ?',
-			{
-				fname: req.body.fname,
-				lname: req.body.lname,
-				email: req.body.email,
-				phone: req.body.phone,
-				address: req.body.address,
-				preferredContactMethod: req.body.preferredContactMethod,
-				frequency: req.body.frequency
-			});
-	}
-
-	/* Now, repull it out, since he's gotta be in there. We need the id... Used when specifying the donor during donation creation. (FOREIGN KEY REFERENCES stuff...) */
-	const [rows] = await pool.query('SELECT * FROM donors WHERE email = ?', [req.body.email]);
-
-	/* Create the donation. */
-	await pool.query('INSERT INTO donations SET ?',
-		{
-			paymentAmount: req.body.paymentAmount,
-			paymentDetails: req.body.paymentDetails,
-			paymentType: req.body.paymentType,
-			paymentMethod: req.body.paymentMethod,
-			paymentDateTime: req.body.paymentDateTime,
-			inputDateTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
-			donor: rows[0].id,
-			creator: req.session.userid
-		});
-
-	/* Set the donor's most recent donation datetime. */
-	const [donations] = await pool.query('SELECT * FROM donations WHERE donor = ? ORDER BY paymentDateTime DESC', [rows[0].id]);
-	await pool.query('UPDATE donors SET lastPaymentDateTime = ? WHERE id = ?', [donations[0].paymentDateTime, rows[0].id]);
-
-	/* Is this needed? */
-	res.redirect("/createdonation");
-});
-
-/** Donor managment. Does not create donor as donation creation does that. */
-app.get("/update/:id", async (req, res) => {
-	if (!check(req, res)) { return; };
-	const { id } = req.params;
-	const [result] = await pool.query("SELECT * FROM donors WHERE id = ?", [
-		id,
-	]);
-	res.render("donor_edit", { donor: result[0], info: req.session });
-});
-app.post("/update/:id", async (req, res) => {
-	const { id } = req.params;
-	const newDonor = req.body;
-	await pool.query("UPDATE donors set ? WHERE id = ?", [newDonor, id]);
-	res.redirect("/lusers");
-});
-app.get("/delete/:id", async (req, res) => {
-	if (!check(req, res)) { return; };
-	const { id } = req.params;
-	const [result] = await pool.query("SELECT * FROM donors WHERE id = ?", [
-		id,
-	]);
-	res.render("donor_delete", { donor: result[0], info: req.session });
-});
-app.post("/delete/:id", async (req, res) => {
-	const { id } = req.params;
-	await pool.query("DELETE FROM donations WHERE donor = ?", [id]);
-	await pool.query("DELETE FROM donors WHERE id = ?", [id]);
-	res.redirect("/lusers");
-});
+/** Donor managment. Only edit and deletes, does not create donor as donation creation does that. */
+app.get("/update/:id", renderUpdateDonor);
+app.post("/update/:id", updateDonor);
+app.get("/delete/:id", renderDeleteDonor);
+app.post("/delete/:id", deleteDonor);
 
 /** User management. Actions limited only to Admins. */
 app.get("/lusers", renderLusers);
