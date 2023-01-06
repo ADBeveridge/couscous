@@ -66,6 +66,12 @@ app.use(express.static(path.join(__dirname, "public")));
 app.get('/', async (request, response) => {
 	if (!check(request, response)) { return; };
 
+	/** Send the owner to the management page. */
+	if (request.session.status == "owner") { 
+        response.redirect('/admins');
+        return 0; 
+    }
+
 	/** Render schedule. */
 	/* Get a customers last donation, and coupled with his given donation frequency, calculate if he needs to donate today. */
 	var renderContents = [];
