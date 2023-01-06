@@ -10,10 +10,38 @@
 
 <body>
   <%- include("partials/navbar") %>
+  <h2 class="centert">Statistics</h2>
+  <div class="outside">
+    <div class="inside">
+      <table class="table table-light table-bordered table-hover">
+        <tbody>
+          <% if (donations) { %>
+          <tr>
+            <td>
+              Total This Week
+            </td>
+            <td>
+              <% var x = 0; %>
+              <% for(var x=0; x < donations.length; x++){ %>
+                <% x = x + donations[x].paymentAmount; console.log(x); %>
+              <% } %>
+              <%= x %>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Total This Quarter
+            </td>
+            <td>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-  <h2 class="centert">Donations</h2>
-
-  <!-- Data rendering -->
+  <h2 class="centert">All Donations</h2>
   <div class="outside">
     <div class="inside">
       <table class="table table-light table-bordered table-hover">
@@ -21,6 +49,7 @@
           <tr>
             <td>Donor</td>
             <td>Amount</td>
+            <td>Time</td>
           </tr>
         </thead>
         <tbody>
@@ -30,13 +59,16 @@
             <td>
               <!-- Find the donors email. -->
               <% for(var x=0; x < donors.length; x++){ %>
-                <% if (donors[x].id == donations[i].donor) { %>
+              <% if (donors[x].id == donations[i].donor) { %>
               <%= donors[x].email %>
               <% } %>
               <% } %>
             </td>
             <td>
               <%= '$' + donations[i].paymentAmount.toFixed(2) %>
+            </td>
+            <td>
+              <%= donations[i].paymentDateTime.toDateString() %>
             </td>
           </tr>
           <% } %>

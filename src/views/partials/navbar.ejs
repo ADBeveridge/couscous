@@ -1,11 +1,21 @@
 <nav class="navbar navbar-light bg-light">
   <div class="container">
+    <% if(info.status == "administrator") { %>
     <a class="" href="/">Home</a>
     <a class="" href="/createdonation">Create Donation</a>
-    <% if(info.status == "administrator") { %>
-    <a class="" href="/users">Management</a>
-    <% } %>
+    <a class="" href="/lusers">Management</a>
     <a class="" href="/donations">Audit Statistics</a>
     <a class="" href="/logout">Logout</a>
+    <% } %>
+    <% if(info.status == "luser") { %>
+    <a class="" href="/">Home</a>
+    <a class="" href="/createdonation">Create Donation</a>
+    <a class="" href="/donations">Audit Statistics</a>
+    <a class="" href="/logout">Logout</a>
+    <% } %>
+    <% if(info.status == "owner") { %>
+    <a class="" href="/admins">Management</a>
+    <a class="" href="/logout">Logout</a>
+    <% } %>
   </div>
 </nav>

@@ -3,11 +3,28 @@ import session from "express-session";
 import path from "path";
 import morgan from "morgan";
 import { fileURLToPath } from "url";
-import { Router } from "express";
-import { createPool } from "mysql2/promise";
 import mysql from "mysql";
 import { request } from "http";
 import { channel } from "diagnostics_channel";
+
+import pool from "./database.js";
+import {
+	deleteLuser,
+	renderDeleteLuser,
+	renderLusers,
+	addLuser,
+	renderUpdateLuser,
+	updateLuser,
+} from "./admin.js";
+
+import {
+	deleteAdmin,
+	renderDeleteAdmin,
+	renderAdmins,
+	addAdmin,
+	renderUpdateAdmin,
+	updateAdmin,
+} from "./owner.js";
 
 // Used by login system.
 const connection = mysql.createConnection({
@@ -17,32 +34,21 @@ const connection = mysql.createConnection({
 	database: "ebdb"
 });
 
-// Used by customers system.
-const pool = createPool({
-	host: "awseb-e-aztph9uyyz-stack-awsebrdsdatabase-ta4zdp05fs81.c3kwci5hfksz.us-east-1.rds.amazonaws.com",
-	user: "admin",
-	password: "WwlzJ9gIVXQe",
-	database: "ebdb"
-});
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /* App. Configure what it uses. */
 const app = express();
-app.use(session({
-	secret: 'secret',
-	resave: true,
-	saveUninitialized: true
-}));
+app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.set("port", process.env.PORT || 3000);
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "public")));
 
-/* The first called function, just reroutes to auth or customers. */
+/* The first called function, shows the schedule. */
 app.get('/', async (request, response) => {
 	if (!check(request, response)) { return; };
 
@@ -67,9 +73,7 @@ app.get('/', async (request, response) => {
 			renderContents.push(result[i]);
 		}
 	}
-
 	response.render("sched", { donations: renderContents, info: request.session });
-
 });
 
 /** Login and logout. */
@@ -100,20 +104,21 @@ app.post('/auth', function (request, response) {
 		response.redirect('/');
 	});
 });
+/* Deinitialize variables that identify the user as logged in. */
 app.get('/logout', function (request, response) {
-	// Authenticate the user
 	request.session.loggedin = false;
 	request.session.email = null;
 	request.session.isAdmin = false;
 	response.redirect('/');
 });
 
-/** Utility functions. */
+/** Compare a date without cosidering the time. */
 function sameDay(d1, d2) {
 	return d1.getFullYear() === d2.getFullYear() &&
 		d1.getMonth() === d2.getMonth() &&
 		d1.getDate() === d2.getDate();
 }
+/** Check if user is logged in. */
 function check(request, res) {
 	if (!request.session.loggedin) {
 		res.sendFile(path.join(__dirname + '/login.html'));
@@ -122,8 +127,18 @@ function check(request, res) {
 	return 1;
 }
 
-/** Create donation (and donor too if needed.) */
-app.post("/add", async (req, res) => {
+/** Donation managment. */
+app.get("/donations", async (req, res) => {
+	if (!check(req, res)) { return; };
+	const [rows] = await pool.query("SELECT * FROM donations");
+	const [rows2] = await pool.query("SELECT * FROM donors");
+	res.render("donations", { donations: rows, donors: rows2, info: req.session });
+});
+app.get("/createdonation", async (req, res) => {
+	if (!check(req, res)) { return; };
+	res.render("donation_create", { info: req.session });
+});
+app.post("/createdonation", async (req, res) => {
 	/* See if the donor has already donated to the organization. Identifed only by email. */
 	const [data] = await pool.query('SELECT * FROM donors WHERE email = ?', [req.body.email]);
 
@@ -165,19 +180,6 @@ app.post("/add", async (req, res) => {
 	/* Is this needed? */
 	res.redirect("/createdonation");
 });
-app.get("/donations", async (req, res) => {
-	if (!check(req, res)) { return; };
-	const [rows] = await pool.query("SELECT * FROM donations");
-	const [rows2] = await pool.query("SELECT * FROM donors");
-	res.render("donations", { donations: rows, donors: rows2, info: req.session });
-});
-
-
-/** Schedule */
-app.get("/createdonation", async (req, res) => {
-	if (!check(req, res)) { return; };
-	res.render("donation_create", { info: req.session });
-});
 
 /** Donor managment. Does not create donor as donation creation does that. */
 app.get("/update/:id", async (req, res) => {
@@ -192,7 +194,7 @@ app.post("/update/:id", async (req, res) => {
 	const { id } = req.params;
 	const newDonor = req.body;
 	await pool.query("UPDATE donors set ? WHERE id = ?", [newDonor, id]);
-	res.redirect("/users");
+	res.redirect("/lusers");
 });
 app.get("/delete/:id", async (req, res) => {
 	if (!check(req, res)) { return; };
@@ -206,56 +208,28 @@ app.post("/delete/:id", async (req, res) => {
 	const { id } = req.params;
 	await pool.query("DELETE FROM donations WHERE donor = ?", [id]);
 	await pool.query("DELETE FROM donors WHERE id = ?", [id]);
-	res.redirect("/users");
+	res.redirect("/lusers");
 });
 
-/** User management. */
-app.get("/users", async (req, res) => {
-	if (!check(req, res)) { return; };
-	if (req.session.status == "luser") { res.sendStatus(404); return; }
-	const [result] = await pool.query("SELECT * FROM accounts WHERE status is NULL && hidden = 0");
-	const [rows] = await pool.query("SELECT * FROM donors");
-	res.render("users", { users: result, info: req.session, donors: rows });
-});
-app.post("/adduser", async (req, res) => {
-	const newUser = req.body;
-	newUser["hidden"] = 0;
-	await pool.query("INSERT INTO accounts set ?", [newUser]);
-	res.redirect("/users");
-});
-app.get("/updateuser/:id", async (req, res) => {
-	if (!check(req, res)) { return; };
-	if (req.session.status == "luser") { res.sendStatus(404); return; }
-	const { id } = req.params;
-	const [result] = await pool.query("SELECT * FROM accounts where id = ?", [
-		id,
-	]);
-	res.render("user_edit", { user: result[0], info: req.session });
-});
-app.post("/updateuser/:id", async (req, res) => {
-	const { id } = req.params;
-	const newuser = req.body;
-	await pool.query("UPDATE accounts set ? WHERE id = ?", [newuser, id]);
-	res.redirect("/users");
-});
-app.get("/deleteuser/:id", async (req, res) => {
-	if (!check(req, res)) { return; };
-	if (req.session.status == "luser") { res.sendStatus(404); return; }
-	const { id } = req.params;
-	const [result] = await pool.query("SELECT * FROM accounts WHERE id = ?", [
-		id,
-	]);
-	res.render("user_delete", { user: result[0], info: req.session });
-});
-app.post("/deleteuser/:id", async (req, res) => {
-	const { id } = req.params;
-	await pool.query("UPDATE accounts set hidden = 1 WHERE id = ?", [id]);
-	res.redirect("/users");
-});
+/** User management. Actions limited only to Admins. */
+app.get("/lusers", renderLusers);
+app.post("/addluser", addLuser);
+app.get("/updateluser/:id", renderUpdateLuser);
+app.post("/updateluser/:id", updateLuser);
+app.get("/deleteluser/:id", renderDeleteLuser);
+app.post("/deleteluser/:id", deleteLuser);
+
+/** User management. Actions limited only to Owners. */
+app.get("/admins", renderAdmins);
+app.post("/addadmin", addAdmin);
+app.get("/updateadmin/:id", renderUpdateAdmin);
+app.post("/updateadmin/:id", updateAdmin);
+app.get("/deleteadmin/:id", renderDeleteAdmin);
+app.post("/deleteadmin/:id", deleteAdmin);
 
 /* 404 handler. */
 app.use((req, res, next) => {
-    res.sendStatus(404);
+	res.sendStatus(404);
 })
 
 // Port to run server on.

@@ -12,20 +12,30 @@
   <!-- navigation -->
   <%- include("partials/navbar") %>
 
-    <h2 class="centert">Delete <%= user.email %>?</h2>
+  <h2 class="centert">Delete <%= user.email %>?</h2>
 
-    <div class="outside">
-      <div class="inside">
-        <div class="card bg-light">
-          <div class="card-body">
-            <form action="/deleteuser/<%= user.id %>" method="POST">
-              <button type="submit" class="btn btn-danger">Delete</button>
-              <a href="/users" class="btn btn-info">Cancel</a>
-            </form>
-          </div>
+  <div class="outside">
+    <div class="inside">
+      <div class="card bg-light">
+        <div class="card-body">
+          <!-- This form delivers the data to /deleteuser. -->
+          <% if(info.status == "administrator") { %>
+          <form action="/deleteluser/<%= user.id %>" method="POST">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="/lusers" class="btn btn-info">Cancel</a>
+          </form>
+          <% } %>
+          <!-- This form delivers the data to /deleteadmin. -->
+          <% if(info.status == "owner") { %>
+          <form action="/deleteadmin/<%= user.id %>" method="POST">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="/admins" class="btn btn-info">Cancel</a>
+          </form>
+          <% } %>
         </div>
       </div>
     </div>
+  </div>
 
 </body>
 
