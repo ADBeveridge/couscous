@@ -29,16 +29,16 @@ import {
 	updateDonor,
 	renderDeleteDonor,
 	deleteDonor
-} from "./admin.js";
+} from "./suser.js";
 
 /* Owner urls. */
 import {
-	deleteAdmin,
-	renderDeleteAdmin,
-	renderAdmins,
-	addAdmin,
-	renderUpdateAdmin,
-	updateAdmin,
+	deleteSuser,
+	renderDeleteSuser,
+	renderSusers,
+	addSuser,
+	renderUpdateSuser,
+	updateSuser,
 } from "./owner.js";
 
 /* Lusers and Admin's urls. */
@@ -46,7 +46,7 @@ import {
 	addDonation,
 	renderAddDonation,
 	renderDonations,
-} from "./luser_admin.js";
+} from "./luser_suser.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -68,7 +68,7 @@ app.get('/', async (request, response) => {
 
 	/** Send the owner to the management page. */
 	if (request.session.status == "owner") { 
-        response.redirect('/admins');
+        response.redirect('/susers');
         return 0; 
     }
 
@@ -127,8 +127,8 @@ app.post('/auth', function (request, response) {
 /* Deinitialize variables that identify the user as logged in. */
 app.get('/logout', function (request, response) {
 	request.session.loggedin = false;
-	request.session.uname = null;
-	request.session.isAdmin = false;
+	request.session.username = null;
+	request.session.status = null;
 	response.redirect('/');
 });
 
@@ -167,12 +167,12 @@ app.get("/deleteluser/:id", renderDeleteLuser);
 app.post("/deleteluser/:id", deleteLuser);
 
 /** User management. Actions limited only to Owners. */
-app.get("/admins", renderAdmins);
-app.post("/addadmin", addAdmin);
-app.get("/updateadmin/:id", renderUpdateAdmin);
-app.post("/updateadmin/:id", updateAdmin);
-app.get("/deleteadmin/:id", renderDeleteAdmin);
-app.post("/deleteadmin/:id", deleteAdmin);
+app.get("/susers", renderSusers);
+app.post("/addadmin", addSuser);
+app.get("/updateadmin/:id", renderUpdateSuser);
+app.post("/updateadmin/:id", updateSuser);
+app.get("/deleteadmin/:id", renderDeleteSuser);
+app.post("/deleteadmin/:id", deleteSuser);
 
 /* 404 handler. */
 app.use((req, res, next) => {

@@ -1,5 +1,10 @@
-create database customersdb;
-use customersdb;
+use ebdb;
+
+create table organizations (
+  id int auto_increment primary key,
+  name varchar(255),
+  governmentId blob
+);
 
 -- people who manage the database have their own accounts.
 create table accounts (
@@ -8,13 +13,9 @@ create table accounts (
   username varchar(255),
   password varchar(255),
   email varchar(255),
-  notify boolean
-);
-
-create table donationorganization (
-  id int auto_increment primary key,
-  name varchar(255),
-  governmentId blob
+  notify boolean,
+  organization int,
+  foreign key (organization) references organizations (id)
 );
 
 create table donors (
@@ -45,4 +46,7 @@ create table donations (
 );
 
 -- insert an account by default. every user is an admin, btw. 
-insert into accounts (id, username, password) values (1, 'user', 'user');
+insert into accounts (username, password, status) values ('luser', 'luser', 'luser');
+insert into accounts (username, password, status) values ('suser', 'suser', 'suser');
+insert into accounts (username, password, status) values ('owner', 'owner', 'owner');
+

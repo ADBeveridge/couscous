@@ -11,45 +11,45 @@
 <body>
   <%- include("partials/navbar") %>
 
-    <h2 class="centert">Donors Due Today</h2>
-    <% if (donations.length> 0) { %>
+  <h2 class="centert">Donors Due Today</h2>
+  <% if (donations.length> 0) { %>
 
-      <div class="outside">
-        <div class="inside">
-          <table class="table table-light table-bordered table-hover">
-            <thead>
-              <tr>
-                <td>Name</td>
-                <td>Email</td>
-                <td>Phone</td>
-                <td>Address</td>
-              </tr>
-            </thead>
-            <tbody>
-              <% for(var i=0; i < donations.length; i++) {%>
-                <tr>
-                  <td>
-                    <%= donations[i].fname + ' ' + donations[i].lname %>
-                  </td>
-                  <td>
-                    <%= donations[i].email %>
-                  </td>
-                  <td>
-                    <%= donations[i].phone %>
-                  </td>
-                  <td>
-                    <%= donations[i].address %>
-                  </td>
-                </tr>
-                <% } %>
+  <div class="outside">
+    <div class="inside">
+      <table class="table table-light table-bordered table-hover">
+        <thead>
+          <tr>
+            <td>Name</td>
+            <td>Email</td>
+            <td>Phone</td>
+            <td>Address</td>
+          </tr>
+        </thead>
+        <tbody>
+          <% for(var i=0; i < donations.length; i++) {%>
+          <tr>
+            <td>
+              <%= donations[i].fname + ' ' + donations[i].lname %>
+            </td>
+            <td>
+              <%= donations[i].email %>
+            </td>
+            <td>
+              <%= donations[i].phone %>
+            </td>
+            <td>
+              <%= donations[i].address %>
+            </td>
+          </tr>
+          <% } %>
 
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <% } else {%>
-        <p class="centert">You are all caught up for today!</p>
-        <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% } else {%>
+  <p class="centert">You are all caught up for today!</p>
+  <% } %>
 </body>
 
 </html>

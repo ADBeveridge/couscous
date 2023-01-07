@@ -22,6 +22,7 @@ function check(req, res) {
 export const renderLusers = async (req, res) => {
 	if (!check(req, res)) { return; };
 	const [result] = await pool.query("SELECT * FROM accounts WHERE status = 'luser' && hidden = 0");
+	console.log("RES" + result);
 	const [rows] = await pool.query("SELECT * FROM donors");
 	res.render("users", { users: result, info: req.session, donors: rows });
 };

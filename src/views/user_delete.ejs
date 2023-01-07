@@ -19,7 +19,7 @@
       <div class="card bg-light">
         <div class="card-body">
           <!-- This form delivers the data to /deleteuser. -->
-          <% if(info.status == "administrator") { %>
+          <% if(info.status == "suser") { %>
           <form action="/deleteluser/<%= user.id %>" method="POST">
             <button type="submit" class="btn btn-danger">Delete</button>
             <a href="/lusers" class="btn btn-info">Cancel</a>

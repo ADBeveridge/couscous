@@ -11,14 +11,15 @@
 <body>
   <%- include("partials/navbar") %>
 
-  <% if(info.status == "administrator") { %>
+  <% if(info.status == "suser") { %>
   <h2 class="centert">Standard Users</h2>
   <% } %>
   <% if(info.status == "owner") { %>
-    <h2 class="centert">Admin Users</h2>
-    <% } %>
+  <h2 class="centert">Admin Users</h2>
+  <% } %>
 
-  <!-- Data rendering -->
+  <!-- We are only rendering this if there are some users. -->
+  <% if (users.length > 0) { %>
   <div class="outside">
     <div class="inside">
       <table class="table table-light table-bordered table-hover">
@@ -41,7 +42,7 @@
             </td>
             <td class="d-flex gap-2">
               <!-- These button's urls reference urls available only to adnins. -->
-              <% if(info.status == "administrator") { %>
+              <% if(info.status == "suser") { %>
               <a href="/updateluser/<%= users[i].id %>" class="btn btn-info">Edit</a>
               <a href="/deleteluser/<%= users[i].id %>" class="btn btn-danger">Delete</a>
               <% } %>
@@ -59,15 +60,19 @@
       </table>
     </div>
   </div>
+  <% } else {%>
+  <p class="centert">No Users Yet</p>
+  <% } %>
 
   <h2 class="centert">Add User</h2>
 
   <div class="col-md-5">
     <div class="card-body">
       <!-- This form delivers the data to /adduser. -->
-      <% if(info.status == "administrator") { %>
+      <% if(info.status == "suser") { %>
       <form action="/addluser" method="POST">
-        <input type="email" name="email" placeholder="Email" class="form-control mb-2" autofocus />
+        <input type="text" name="username" placeholder="Username" class="form-control mb-2" autofocus />
+        <input type="email" name="email" placeholder="Email" class="form-control mb-2" />
         <input type="password" name="password" placeholder="Password" class="form-control mb-2" />
 
         <button type="submit" class="btn btn-info">Add User</button>
@@ -76,7 +81,8 @@
       <!-- This form delivers the data to /addadmin. -->
       <% if(info.status == "owner") { %>
       <form action="/addadmin" method="POST">
-        <input type="email" name="email" placeholder="Email" class="form-control mb-2" autofocus />
+        <input type="text" name="username" placeholder="Username" class="form-control mb-2" autofocus />
+        <input type="email" name="email" placeholder="Email" class="form-control mb-2" />
         <input type="password" name="password" placeholder="Password" class="form-control mb-2" />
 
         <button type="submit" class="btn btn-info">Add User</button>
@@ -85,12 +91,12 @@
     </div>
   </div>
 
-  <% if(info.status == "luser") { %>
+  <% if(info.status == "suser") { %>
 
   <h2 class="centert">Donors</h2>
 
   <!-- Data rendering -->
-  <% if (donors.length> 0) { %>
+  <% if (donors.length > 0) { %>
   <div class="outside">
     <div class="inside">
       <table class="table table-light table-bordered table-hover">
@@ -142,7 +148,7 @@
   </div>
 
   <% } else {%>
-  <h2 class="centert">No Donors Yet</h2>
+  <p class="centert">No Donors Yet</p>
 
   <% } %>
   <% } %>

@@ -21,10 +21,10 @@
             <input type="text" name="email" value="<%= user.email%>" placeholder="Email" class="form-control mb-3" />
             <input type="password" name="password" value="<%= user.password %>" placeholder="Password" class="form-control mb-3" />
             <button type="submit" class="btn btn-primary">Save User</button>
-            <a href="/admins" class="btn btn-primary">Cancel</a>
+            <a href="/susers" class="btn btn-primary">Cancel</a>
           </form>
           <% } %>
-          <% if(info.status == "administrator") { %>
+          <% if(info.status == "suser") { %>
           <form action="/updateluser/<%= user.id %>" method="POST">
             <input type="text" name="email" value="<%= user.email%>" placeholder="Email" class="form-control mb-3" />
             <input type="password" name="password" value="<%= user.password %>" placeholder="Password" class="form-control mb-3" />
