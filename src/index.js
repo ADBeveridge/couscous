@@ -99,16 +99,16 @@ app.get('/', async (request, response) => {
 /** Login and logout. */
 app.post('/auth', function (request, response) {
 	// Capture the input fields
-	let email = request.body.email;
+	let uname = request.body.username;
 	let password = request.body.password;
 
-	if (!email || !password) {
+	if (!uname || !password) {
 		response.send('Please enter Username and Password!');
 		return;
 	}
 
 	// Execute SQL query that'll select the account from the database based on the specified username and password
-	connection.query('SELECT * FROM accounts WHERE email = ? AND password = ?', [email, password], function (error, results, fields) {
+	connection.query('SELECT * FROM accounts WHERE username = ? AND password = ?', [uname, password], function (error, results, fields) {
 		// If there is an issue with the query, output the error
 		if (error) throw error;
 		// If the account exists
@@ -118,7 +118,7 @@ app.post('/auth', function (request, response) {
 		}
 		// Authenticate the user
 		request.session.loggedin = true;
-		request.session.email = email;
+		request.session.username = uname;
 		request.session.status = results[0].status;
 
 		response.redirect('/');
@@ -127,7 +127,7 @@ app.post('/auth', function (request, response) {
 /* Deinitialize variables that identify the user as logged in. */
 app.get('/logout', function (request, response) {
 	request.session.loggedin = false;
-	request.session.email = null;
+	request.session.uname = null;
 	request.session.isAdmin = false;
 	response.redirect('/');
 });
