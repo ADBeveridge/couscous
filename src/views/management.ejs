@@ -15,7 +15,7 @@
   <h2 class="centert">Standard Users</h2>
   <% } %>
   <% if(info.status == "owner") { %>
-  <h2 class="centert">Admin Users</h2>
+  <h2 class="centert">Super Users</h2>
   <% } %>
 
   <!-- We are only rendering this if there are some users. -->
@@ -64,27 +64,42 @@
   <p class="centert">No Users Yet</p>
   <% } %>
 
-  <h2 class="centert">Add User</h2>
-
-  <div class="col-md-5">
-    <div class="card-body">
+  <div class="outside">
+    <div class="inside">
       <!-- This form delivers the data to /adduser. -->
       <% if(info.status == "suser") { %>
       <form action="/addluser" method="POST">
-        <input type="text" name="username" placeholder="Username" class="form-control mb-2" autofocus />
-        <input type="email" name="email" placeholder="Email" class="form-control mb-2" />
-        <input type="password" name="password" placeholder="Password" class="form-control mb-2" />
-
+        <div class="form-group">
+          <h3 class="centert">User Info</h3>
+          <input type="text" name="username" placeholder="Username" class="form-control mb-2" autofocus />
+          <input type="email" name="email" placeholder="Email" class="form-control mb-2" />
+          <input type="password" name="password" placeholder="Password" class="form-control mb-2" />
+        </div>
+        <div class="form-group">
+          <h3 class="centert">Organization Info</h3>
+          <input type="text" name="username" placeholder="Username" class="form-control mb-2" autofocus />
+          <input type="email" name="email" placeholder="Email" class="form-control mb-2" />
+          <input type="password" name="password" placeholder="Password" class="form-control mb-2" />
+        </div>
         <button type="submit" class="btn btn-info">Add User</button>
+        <hr>
       </form>
       <% } %>
-      <!-- This form delivers the data to /addadmin. -->
+      <!-- This form delivers the data to /addsuser. -->
       <% if(info.status == "owner") { %>
       <form action="/addadmin" method="POST">
-        <input type="text" name="username" placeholder="Username" class="form-control mb-2" autofocus />
-        <input type="email" name="email" placeholder="Email" class="form-control mb-2" />
-        <input type="password" name="password" placeholder="Password" class="form-control mb-2" />
-
+        <div class="form-group">
+          <h3 class="centert">User Info</h3>
+          <input type="text" name="username" placeholder="Username" class="form-control mb-2" autofocus />
+          <input type="email" name="email" placeholder="Email" class="form-control mb-2" />
+          <input type="password" name="password" placeholder="Password" class="form-control mb-2" />
+        </div>
+        <div class="form-group">
+          <h3 class="centert">Organization Info</h3>
+          <input type="text" name="username" placeholder="Username" class="form-control mb-2" autofocus />
+          <input type="email" name="email" placeholder="Email" class="form-control mb-2" />
+          <input type="password" name="password" placeholder="Password" class="form-control mb-2" />
+        </div>
         <button type="submit" class="btn btn-info">Add User</button>
       </form>
       <% } %>
@@ -92,7 +107,6 @@
   </div>
 
   <% if(info.status == "suser") { %>
-
   <h2 class="centert">Donors</h2>
 
   <!-- Data rendering -->
