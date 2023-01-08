@@ -15,6 +15,7 @@ create table accounts (
   email varchar(255),
   notify boolean,
   organization int,
+  hidden boolean,
   foreign key (organization) references organizations (id)
 );
 

@@ -22,7 +22,7 @@ export const renderSusers = async (req, res) => {
 	if (!check(req, res)) { return; };
 	const [result] = await pool.query("SELECT * FROM accounts WHERE status = 'suser' && hidden = 0");
 	const [rows] = await pool.query("SELECT * FROM donors");
-	res.render("users", { users: result, info: req.session, donors: rows });
+	res.render("management", { users: result, info: req.session, donors: rows });
 };
 
 export const addSuser = async (req, res) => {
@@ -40,7 +40,7 @@ export const renderUpdateSuser = async (req, res) => {
 	const [result] = await pool.query("SELECT * FROM accounts where id = ?", [
 		id,
 	]);
-	res.render("user_edit", { user: result[0], info: req.session });
+	res.render("management_edit", { user: result[0], info: req.session });
 }
 export const updateSuser = async (req, res) => {
 	const { id } = req.params;
@@ -55,7 +55,7 @@ export const renderDeleteSuser = async (req, res) => {
 	const [result] = await pool.query("SELECT * FROM accounts WHERE id = ?", [
 		id,
 	]);
-	res.render("user_delete", { user: result[0], info: req.session });
+	res.render("management_delete", { user: result[0], info: req.session });
 }
 export const deleteSuser = async (req, res) => {
 	const { id } = req.params;

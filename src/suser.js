@@ -24,7 +24,7 @@ export const renderLusers = async (req, res) => {
 	const [result] = await pool.query("SELECT * FROM accounts WHERE status = 'luser' && hidden = 0");
 	console.log("RES" + result);
 	const [rows] = await pool.query("SELECT * FROM donors");
-	res.render("users", { users: result, info: req.session, donors: rows });
+	res.render("management", { users: result, info: req.session, donors: rows });
 };
 
 export const addLuser = async (req, res) => {
@@ -42,7 +42,7 @@ export const renderUpdateLuser = async (req, res) => {
 	const [result] = await pool.query("SELECT * FROM accounts where id = ?", [
 		id,
 	]);
-	res.render("user_edit", { user: result[0], info: req.session });
+	res.render("managment_edit", { user: result[0], info: req.session });
 }
 export const updateLuser = async (req, res) => {
 	const { id } = req.params;
@@ -57,7 +57,7 @@ export const renderDeleteLuser = async (req, res) => {
 	const [result] = await pool.query("SELECT * FROM accounts WHERE id = ?", [
 		id,
 	]);
-	res.render("user_delete", { user: result[0], info: req.session });
+	res.render("management_delete", { user: result[0], info: req.session });
 }
 export const deleteLuser = async (req, res) => {
 	const { id } = req.params;
