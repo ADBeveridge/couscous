@@ -31,8 +31,10 @@ create table donors (
   contactNotes varchar(255),
   frequency int,
   creator int,
+  organization int,
   lastPaymentDateTime datetime,
-  foreign key (creator) references accounts(id)
+  foreign key (creator) references accounts(id),
+  foreign key (organization) references organizations (id)
 );
 
 create table donations (
