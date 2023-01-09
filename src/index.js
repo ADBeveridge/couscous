@@ -78,7 +78,6 @@ app.get('/', async (request, response) => {
 
 	/** This query returns results that are only for this organization. */
 	const [result] = await pool.query("SELECT * FROM donors WHERE organization = ?", [request.session.organization]);
-	console.log(result);
 	for (var i = 0; i < result.length; i++) {
 		const [rows] = await pool.query('SELECT * FROM donations WHERE donor = ? ORDER BY paymentDateTime DESC', [result[i].id]);
 		if (rows.length === 0) {

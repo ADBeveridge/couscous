@@ -69,6 +69,7 @@ export const deleteSuser = async (req, res) => {
 	await pool.query("UPDATE accounts set hidden = 1 WHERE id = ?", [id]);
 	res.redirect("/susers");
 }
+
 /** Organization management. */
 export const renderCreateOrganization = async (req, res) => {
 	if (!check(req, res)) { return; };

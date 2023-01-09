@@ -39,7 +39,8 @@ export const addDonation = async (req, res) => {
 			paymentDateTime: req.body.paymentDateTime,
 			inputDateTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
 			donor: data[0].id,
-			creator: req.session.userid
+			creator: req.session.userid,
+			organization: req.session.organization
 		});
 
 	/* Update the donor's most recent donation datetime. */

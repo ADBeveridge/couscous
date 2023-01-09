@@ -7,15 +7,18 @@ function check(req, res) {
 		res.sendFile(path.join(__dirname + '/login.html'));
 		return 0;
 	}
-    if (req.session.status == "luser") { 
-        res.sendStatus(404);
-        return 0; 
-    }
-    if (req.session.status == "owner") { 
-        res.sendStatus(404);
-        return 0; 
-    }
+	if (req.session.status == "luser") {
+		res.sendStatus(404);
+		return 0;
+	}
+	if (req.session.status == "owner") {
+		res.sendStatus(404);
+		return 0;
+	}
 	return 1;
+}
+function getQuarter(date = new Date()) {
+	return Math.floor(date.getMonth() / 3 + 1);
 }
 
 /** Luser management. */
@@ -24,7 +27,7 @@ export const renderLusers = async (req, res) => {
 	const [result] = await pool.query("SELECT * FROM accounts WHERE status = 'luser' && hidden = 0 && organization = ?", req.session.organization);
 	const [organizations] = await pool.query("SELECT * FROM organizations WHERE id = ?", [req.session.organization]);
 	const [rows] = await pool.query("SELECT * FROM donors WHERE organization = ?", [req.session.organization]);
-	res.render("management", { users: result, info: req.session, donors: rows, organizations: organizations});
+	res.render("management", { users: result, info: req.session, donors: rows, organizations: organizations });
 };
 
 export const addLuser = async (req, res) => {
@@ -102,9 +105,19 @@ export const renderStatistics = async (req, res) => {
 	if (!check(req, res)) { return; };
 	const [rows] = await pool.query("SELECT * FROM donations WHERE organization = ?", [req.session.organization]);
 	const [rows2] = await pool.query("SELECT * FROM donors WHERE organization = ?", [req.session.organization]); // We need to display the email of the donor that issued the donation.
+
 	const statistics = {
-		quarterTotal: 44,
-		weekTotal: 22
+		highestDonation: 0,
+		total: 0
 	};
-	res.render("statistics", { donations: rows, donors: rows2, info: req.session, statistics: statistics});
+
+	for (var x = 0; x < rows.length; x++) {
+		statistics.total += rows[x].paymentAmount;
+
+		if (rows[x].paymentAmount > statistics.highestDonation) {
+			statistics.highestDonation = rows[x].paymentAmount;
+		}
+	}
+
+	res.render("statistics", { info: req.session, statistics: statistics });
 };

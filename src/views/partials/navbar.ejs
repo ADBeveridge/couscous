@@ -1,7 +1,7 @@
 <nav class="navbar navbar-light bg-light">
   <div class="container">
     <% if(info.status == "suser") { %>
-    <a class="navbar-brand"><%= info.organizationName %> </a>
+    <a class="navbar-brand"><%= info.username + "  |  " + info.organizationName %></a>
     <a class="" href="/">Schedule</a>
     <a class="" href="/createdonation">Create Donation</a>
     <a class="" href="/lusers">Management</a>
@@ -9,7 +9,7 @@
     <a class="" href="/logout">Logout</a>
     <% } %>
     <% if(info.status == "luser") { %>
-    <a class="navbar-brand"><%= info.organizationName %> </a>
+    <a class="navbar-brand"><%= info.organizationName  %></a>
     <a class="" href="/">Schedule</a>
     <a class="" href="/createdonation">Create Donation</a>
     <a class="" href="/logout">Logout</a>

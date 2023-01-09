@@ -15,21 +15,14 @@
     <div class="inside">
       <table class="table table-light table-bordered table-hover">
         <tbody>
-          <% if (donations) { %>
+          <% if (statistics) { %>
           <tr>
-            <td>
-              Total This Week
-            </td>
-            <td>
-              <%=  %>
-            </td>
+            <td>Highest Donation</td>
+            <td><%= statistics.highestDonation.toFixed(2) %></td>
           </tr>
           <tr>
-            <td>
-              Total This Quarter
-            </td>
-            <td>
-            </td>
+            <td>Total</td>
+            <td><%= statistics.total.toFixed(2) %></td>
           </tr>
           <% } %>
         </tbody>
