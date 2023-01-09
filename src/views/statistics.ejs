@@ -37,43 +37,6 @@
     </div>
   </div>
 
-  <h2 class="centert">All Donations</h2>
-  <div class="outside">
-    <div class="inside">
-      <table class="table table-light table-bordered table-hover">
-        <thead>
-          <tr>
-            <td>Donor</td>
-            <td>Amount</td>
-            <td>Time</td>
-          </tr>
-        </thead>
-        <tbody>
-          <% if (donations) { %>
-          <% for(var i=0; i < donations.length; i++) {%>
-          <tr>
-            <td>
-              <!-- Find the donors email. -->
-              <% for(var x=0; x < donors.length; x++){ %>
-              <% if (donors[x].id == donations[i].donor) { %>
-              <%= donors[x].email %>
-              <% } %>
-              <% } %>
-            </td>
-            <td>
-              <%= '$' + donations[i].paymentAmount.toFixed(2) %>
-            </td>
-            <td>
-              <%= donations[i].paymentDateTime.toDateString() %>
-            </td>
-          </tr>
-          <% } %>
-          <% } %>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
 </body>
 
 </html>

@@ -102,5 +102,9 @@ export const renderStatistics = async (req, res) => {
 	if (!check(req, res)) { return; };
 	const [rows] = await pool.query("SELECT * FROM donations WHERE organization = ?", [req.session.organization]);
 	const [rows2] = await pool.query("SELECT * FROM donors WHERE organization = ?", [req.session.organization]); // We need to display the email of the donor that issued the donation.
-	res.render("statistics", { donations: rows, donors: rows2, info: req.session });
+	const statistics = {
+		quarterTotal: 44,
+		weekTotal: 22
+	};
+	res.render("statistics", { donations: rows, donors: rows2, info: req.session, statistics: statistics});
 };
