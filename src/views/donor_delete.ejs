@@ -12,6 +12,7 @@
   <!-- navigation -->
   <%- include("partials/navbar") %>
     <h2 class="centert">Delete <%= donor.email %>?</h2>
+    <p class="centert">Donations made by this donor will not be deleted, just the donor.</p>
 
     <div class="outside">
       <div class="inside">
@@ -19,7 +20,7 @@
           <div class="card-body">
             <form action="/delete/<%= donor.id %>" method="POST">
               <button type="submit" class="btn btn-danger">Delete</button>
-              <a href="/users" class="btn btn-info">Cancel</a>
+              <a href="/lusers" class="btn btn-info">Cancel</a>
             </form>
           </div>
         </div>

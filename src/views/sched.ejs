@@ -12,7 +12,7 @@
   <%- include("partials/navbar") %>
 
   <h2 class="centert">Donors Due Today</h2>
-  <% if (donations.length> 0) { %>
+  <% if (donors.length > 0) { %>
 
   <div class="outside">
     <div class="inside">
@@ -20,25 +20,29 @@
         <thead>
           <tr>
             <td>Name</td>
+            <td>Preferred Contact Method</td>
             <td>Email</td>
             <td>Phone</td>
             <td>Address</td>
           </tr>
         </thead>
         <tbody>
-          <% for(var i=0; i < donations.length; i++) {%>
+          <% for(var i=0; i < donors.length; i++) {%>
           <tr>
             <td>
-              <%= donations[i].fname + ' ' + donations[i].lname %>
+              <%= donors[i].fname + ' ' + donors[i].lname %>
             </td>
             <td>
-              <%= donations[i].email %>
+              <%= donors[i].preferredContactMethod %>
             </td>
             <td>
-              <%= donations[i].phone %>
+              <%= donors[i].email %>
             </td>
             <td>
-              <%= donations[i].address %>
+              <%= donors[i].phone %>
+            </td>
+            <td>
+              <%= donors[i].address %>
             </td>
           </tr>
           <% } %>

@@ -25,9 +25,9 @@
             <a href="/lusers" class="btn btn-info">Cancel</a>
           </form>
           <% } %>
-          <!-- This form delivers the data to /deleteadmin. -->
+          <!-- This form delivers the data to /deletesuser. -->
           <% if(info.status == "owner") { %>
-          <form action="/deleteadmin/<%= user.id %>" method="POST">
+          <form action="/deletesuser/<%= user.id %>" method="POST">
             <button type="submit" class="btn btn-danger">Delete</button>
             <a href="/susers" class="btn btn-info">Cancel</a>
           </form>

@@ -9,15 +9,7 @@ import { channel } from "diagnostics_channel";
 
 import pool from "./database.js";
 
-// Used by login system.
-const connection = mysql.createConnection({
-	host: "awseb-e-aztph9uyyz-stack-awsebrdsdatabase-ta4zdp05fs81.c3kwci5hfksz.us-east-1.rds.amazonaws.com",
-	user: "admin",
-	password: "WwlzJ9gIVXQe",
-	database: "ebdb"
-});
-
-/* Administator urls. */
+/* Suser urls. */
 import {
 	deleteLuser,
 	renderDeleteLuser,
@@ -28,7 +20,8 @@ import {
 	renderUpdateDonor,
 	updateDonor,
 	renderDeleteDonor,
-	deleteDonor
+	deleteDonor,
+	renderDonations
 } from "./suser.js";
 
 /* Owner urls. */
@@ -39,13 +32,20 @@ import {
 	addSuser,
 	renderUpdateSuser,
 	updateSuser,
+	renderCreateOrganization,
+	createOrganization,
+	renderUpdateOrganization,
+	updateOrganization,
+	renderDeleteOrganization,
+	deleteOrganization
 } from "./owner.js";
 
-/* Lusers and Admin's urls. */
+/* Lusers and Suser's urls. */
 import {
 	addDonation,
 	renderAddDonation,
-	renderDonations,
+	addDonor,
+	renderAddDonor
 } from "./luser_suser.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -66,15 +66,15 @@ app.use(express.static(path.join(__dirname, "public")));
 app.get('/', async (request, response) => {
 	if (!check(request, response)) { return; };
 
-	/** Send the owner to the management page. */
-	if (request.session.status == "owner") { 
-        response.redirect('/susers');
-        return 0; 
-    }
+	/** If owner, send the owner to the management page. He can't see the schedule. */
+	if (request.session.status == "owner") {
+		response.redirect('/susers');
+		return 0;
+	}
 
 	/** Render schedule. */
 	/* Get a customers last donation, and coupled with his given donation frequency, calculate if he needs to donate today. */
-	var renderContents = [];
+	var donorsDue = [];
 
 	const [result] = await pool.query("SELECT * FROM donors");
 	for (var i = 0; i < result.length; i++) {
@@ -90,14 +90,14 @@ app.get('/', async (request, response) => {
 		var today = new Date();
 
 		if (sameDay(fDate, today) === true) {
-			renderContents.push(result[i]);
+			donorsDue.push(result[i]);
 		}
 	}
-	response.render("sched", { donations: renderContents, info: request.session });
+	response.render("sched", { donors: donorsDue, info: request.session });
 });
 
 /** Login and logout. */
-app.post('/auth', function (request, response) {
+app.post('/auth', async (request, response) => {
 	// Capture the input fields
 	let uname = request.body.username;
 	let password = request.body.password;
@@ -108,27 +108,34 @@ app.post('/auth', function (request, response) {
 	}
 
 	// Execute SQL query that'll select the account from the database based on the specified username and password
-	connection.query('SELECT * FROM accounts WHERE username = ? AND password = ?', [uname, password], function (error, results, fields) {
-		// If there is an issue with the query, output the error
-		if (error) throw error;
-		// If the account exists
-		if (results.length == 0) {
-			response.send('Incorrect Email and/or Password!');
+	const [data] = await pool.query('SELECT * FROM accounts WHERE username = ? AND password = ?', [uname, password]);
+	if (data.length == 0) {
+		response.send('Incorrect Email and/or Password!');
+		return;
+	}
+
+	// Authenticate the user
+	request.session.loggedin = true;
+	request.session.username = uname;
+	request.session.status = data[0].status;
+	if (request.session.status != "owner") {
+		const [org] = await pool.query('SELECT * FROM organizations WHERE id = ?', [data[0].organization]);
+		if (org.length == 0) {
+			response.send('Error logging in. Please contact support.');
 			return;
 		}
-		// Authenticate the user
-		request.session.loggedin = true;
-		request.session.username = uname;
-		request.session.status = results[0].status;
-
-		response.redirect('/');
-	});
+		request.session.organization = data[0].organization;
+		request.session.organizationName = org[0].name;
+	}
+	response.redirect('/');
 });
+
 /* Deinitialize variables that identify the user as logged in. */
 app.get('/logout', function (request, response) {
 	request.session.loggedin = false;
 	request.session.username = null;
 	request.session.status = null;
+	request.session.organization = 0;
 	response.redirect('/');
 });
 
@@ -147,18 +154,20 @@ function check(request, res) {
 	return 1;
 }
 
-/** Donation managment. Can be used by both admins and lusers. */
+/** Donation management. Can be used by both susers and lusers. */
 app.get("/donations", renderDonations);
 app.get("/createdonation", renderAddDonation);
 app.post("/createdonation", addDonation);
 
-/** Donor managment. Only edit and deletes, does not create donor as donation creation does that. */
+/** Donor management. Only edit and deletes, does not create donor as donation creation does that. */
 app.get("/update/:id", renderUpdateDonor);
 app.post("/update/:id", updateDonor);
 app.get("/delete/:id", renderDeleteDonor);
 app.post("/delete/:id", deleteDonor);
+app.get("/add", renderAddDonor);
+app.post("/add", addDonor);
 
-/** User management. Actions limited only to Admins. */
+/** User management. Actions limited only to Susers. */
 app.get("/lusers", renderLusers);
 app.post("/addluser", addLuser);
 app.get("/updateluser/:id", renderUpdateLuser);
@@ -168,11 +177,19 @@ app.post("/deleteluser/:id", deleteLuser);
 
 /** User management. Actions limited only to Owners. */
 app.get("/susers", renderSusers);
-app.post("/addadmin", addSuser);
-app.get("/updateadmin/:id", renderUpdateSuser);
-app.post("/updateadmin/:id", updateSuser);
-app.get("/deleteadmin/:id", renderDeleteSuser);
-app.post("/deleteadmin/:id", deleteSuser);
+app.post("/addsuser", addSuser);
+app.get("/updatesuser/:id", renderUpdateSuser);
+app.post("/updatesuser/:id", updateSuser);
+app.get("/deletesuser/:id", renderDeleteSuser);
+app.post("/deletesuser/:id", deleteSuser);
+
+/* Organization management. */
+app.get("/addorganization", renderCreateOrganization);
+app.post("/addorganization", createOrganization);
+app.get("/updateorganization/:id", renderUpdateOrganization);
+app.post("/updateorganization/:id", updateOrganization);
+app.get("/deleteorganization/:id", renderDeleteOrganization);
+app.post("/deleteorganization/:id", deleteOrganization);
 
 /* 404 handler. */
 app.use((req, res, next) => {

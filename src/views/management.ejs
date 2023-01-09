@@ -18,15 +18,17 @@
   <h2 class="centert">Super Users</h2>
   <% } %>
 
-  <!-- We are only rendering this if there are some users. -->
+  <!-- Render users. JS takes care of which class of users is rendered. -->
   <% if (users.length > 0) { %>
   <div class="outside">
     <div class="inside">
       <table class="table table-light table-bordered table-hover">
         <thead>
           <tr>
+            <td>Username</td>
             <td>Email</td>
             <td>Password</td>
+            <td>Organization</td>
             <td>Actions</td>
           </tr>
         </thead>
@@ -34,11 +36,15 @@
           <% if (users) { %>
           <% for(var i=0; i < users.length; i++) {%>
           <tr>
+            <td><%=users[i].username%></td>
+            <td><%= users[i].email %></td>
+            <td><%= '●' .repeat(users[i].password.length) %></td>
             <td>
-              <%= users[i].email %>
-            </td>
-            <td>
-              <%= '●' .repeat(users[i].password.length) %>
+              <% for(var x=0; x < organizations.length; x++){ %>
+              <% if (organizations[x].id == users[i].organization) { %>
+              <%= organizations[0].name %>
+              <% } %>
+              <% } %>
             </td>
             <td class="d-flex gap-2">
               <!-- These button's urls reference urls available only to adnins. -->
@@ -48,8 +54,8 @@
               <% } %>
               <!-- These button's urls reference urls available only to owners. -->
               <% if(info.status == "owner") { %>
-              <a href="/updateadmin/<%= users[i].id %>" class="btn btn-info">Edit</a>
-              <a href="/deleteadmin/<%= users[i].id %>" class="btn btn-danger">Delete</a>
+              <a href="/updatesuser/<%= users[i].id %>" class="btn btn-info">Edit</a>
+              <a href="/deletesuser/<%= users[i].id %>" class="btn btn-danger">Delete</a>
               <% } %>
             </td>
           </tr>
@@ -61,22 +67,19 @@
     </div>
   </div>
   <% } else {%>
-  <p class="centert">No Users Yet</p>
+  <p class="centert">No Users</p>
   <% } %>
 
+  <!-- Create User -->
+  <h2 class="centert">Add User</h2>
   <div class="outside">
     <div class="inside">
-      <!-- This form delivers the data to /adduser. -->
+      <!-- This form delivers the data to /addluser. -->
       <% if(info.status == "suser") { %>
       <form action="/addluser" method="POST">
+        <hr>
         <div class="form-group">
           <h3 class="centert">User Info</h3>
-          <input type="text" name="username" placeholder="Username" class="form-control mb-2" autofocus />
-          <input type="email" name="email" placeholder="Email" class="form-control mb-2" />
-          <input type="password" name="password" placeholder="Password" class="form-control mb-2" />
-        </div>
-        <div class="form-group">
-          <h3 class="centert">Organization Info</h3>
           <input type="text" name="username" placeholder="Username" class="form-control mb-2" autofocus />
           <input type="email" name="email" placeholder="Email" class="form-control mb-2" />
           <input type="password" name="password" placeholder="Password" class="form-control mb-2" />
@@ -87,29 +90,74 @@
       <% } %>
       <!-- This form delivers the data to /addsuser. -->
       <% if(info.status == "owner") { %>
-      <form action="/addadmin" method="POST">
+      <form action="/addsuser" method="POST">
         <div class="form-group">
           <h3 class="centert">User Info</h3>
-          <input type="text" name="username" placeholder="Username" class="form-control mb-2" autofocus />
+          <input type="text" name="username" placeholder="Username" class="form-control mb-2" autofocus required/>
           <input type="email" name="email" placeholder="Email" class="form-control mb-2" />
-          <input type="password" name="password" placeholder="Password" class="form-control mb-2" />
-        </div>
-        <div class="form-group">
-          <h3 class="centert">Organization Info</h3>
-          <input type="text" name="username" placeholder="Username" class="form-control mb-2" autofocus />
-          <input type="email" name="email" placeholder="Email" class="form-control mb-2" />
-          <input type="password" name="password" placeholder="Password" class="form-control mb-2" />
+          <input type="password" name="password" placeholder="Password" class="form-control mb-2" required/>
+
+          <label for="organization" class="sr-only">Organization</label>
+          <select required class="form-control mb-2" type="text" id="organization" name="organization">
+            <option hidden disabled selected value>Organization</option>
+            <% if (organizations) { %>
+            <% for(var i=0; i < organizations.length; i++) {%>
+            <option><%= organizations[i].name %></option>
+            <% } %>
+            <% } %>
+          </select>
         </div>
         <button type="submit" class="btn btn-info">Add User</button>
+        <a class="btn btn-success" href="/addorganization">Create Organization</a>
       </form>
       <% } %>
     </div>
   </div>
 
+  <!-- Organizations -->
+  <% if(info.status == "owner") { %>
+  <h2 class="centert">Organizations</h2>
+  <% if (organizations.length > 0) { %>
+  <div class="outside">
+    <div class="inside">
+      <table class="table table-light table-bordered table-hover">
+        <thead>
+          <tr>
+            <td>Name</td>
+            <td>Government ID</td>
+            <td>Actions</td>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (organizations) { %>
+          <% for(var i=0; i < organizations.length; i++) {%>
+          <tr>
+            <td>
+              <%= organizations[i].name %>
+            </td>
+            <td>
+              <%= organizations[i].governmentId %>
+            </td>
+            <td class="d-flex gap-2">
+              <a href="/updateorganization/<%= organizations[i].id %>" class="btn btn-info">Edit</a>
+              <a href="/deleteorganization/<%= organizations[i].id %>" class="btn btn-danger">Delete</a>
+            </td>
+          </tr>
+          <% } %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% } else {%>
+  <p class="centert">No Organizations</p>
+  <% } %>
+  <% } %>
+
+
+  <!-- Render donors for Suser. -->
   <% if(info.status == "suser") { %>
   <h2 class="centert">Donors</h2>
-
-  <!-- Data rendering -->
   <% if (donors.length > 0) { %>
   <div class="outside">
     <div class="inside">
@@ -129,21 +177,15 @@
           <% if (donors) { %>
           <% for(var i=0; i < donors.length; i++) {%>
           <tr>
-            <td>
-              <%= donors[i].fname + ' ' + donors[i].lname %>
-            </td>
-            <td>
-              <%= donors[i].email %>
-            </td>
-            <td>
-              <%= donors[i].address %>
-            </td>
-            <td>
-              <%= donors[i].phone %>
-            </td>
+            <td><%= donors[i].fname + ' ' + donors[i].lname %></td>
+            <td><%= donors[i].email %></td>
+            <td><%= donors[i].address %></td>
+            <td><%= donors[i].phone %></td>
             <td>Every <%= donors[i].frequency %> days</td>
             <td>
+              <% if (donors[i].lastPaymentDateTime != null) { %>
               <%= donors[i].lastPaymentDateTime.toDateString() %>
+              <% } %>
             </td>
             <td class="d-flex gap-2">
               <a href="/update/<%= donors[i].id %>" class="btn btn-info">
@@ -160,10 +202,8 @@
       </table>
     </div>
   </div>
-
   <% } else {%>
   <p class="centert">No Donors Yet</p>
-
   <% } %>
   <% } %>
 

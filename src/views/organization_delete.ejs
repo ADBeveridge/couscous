@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Donors</title>
+  <link rel="stylesheet" href="https://bootswatch.com/5/lux/bootstrap.min.css">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+  <!-- navigation -->
+  <%- include("partials/navbar") %>
+
+  <h2 class="centert">Delete <%= organization.name %>?</h2>
+  <p class="centert">All users associated with this organization will be deleted also.</p>
+
+  <div class="outside">
+    <div class="inside">
+      <div class="card bg-light">
+        <div class="card-body">
+          <form action="/deleteorganization/<%= organization.id %>" method="POST">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="/susers" class="btn btn-info">Cancel</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

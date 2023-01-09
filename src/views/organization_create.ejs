@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Users</title>
+  <link rel="stylesheet" href="https://bootswatch.com/5/lux/bootstrap.min.css">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+  <%- include("partials/navbar") %>
+
+  <!-- Data rendering -->
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-5 offset-md-3 card bg-light">
+        <div class="card-body">
+          <form action="/addorganization" method="POST">
+            <input type="text" name="oname" placeholder="Organization Name" class="form-control mb-3" required/>
+            <input type="text" name="governmentId" placeholder="Government ID" class="form-control mb-3" />
+            <button type="submit" class="btn btn-success">Create Organization</button>
+            <a href="/susers" class="btn btn-info">Cancel</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

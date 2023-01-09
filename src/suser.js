@@ -22,16 +22,24 @@ function check(req, res) {
 export const renderLusers = async (req, res) => {
 	if (!check(req, res)) { return; };
 	const [result] = await pool.query("SELECT * FROM accounts WHERE status = 'luser' && hidden = 0");
-	console.log("RES" + result);
+	const [organizations] = await pool.query("SELECT * FROM organizations");
 	const [rows] = await pool.query("SELECT * FROM donors");
-	res.render("management", { users: result, info: req.session, donors: rows });
+	res.render("management", { users: result, info: req.session, donors: rows, organizations: organizations});
 };
 
 export const addLuser = async (req, res) => {
-	const newUser = req.body;
-	newUser["hidden"] = 0;
-    newUser["status"] = "luser";
-	await pool.query("INSERT INTO accounts set ?", [newUser]);
+	/* Create the Luser. */
+	await pool.query('INSERT INTO accounts SET ?',
+		{
+			status: "luser",
+			username: req.body.username,
+			email: req.body.email,
+			password: req.body.password,
+			hidden: 0,
+			organization: req.session.organization
+		});
+
+	/* Is this needed? */
 	res.redirect("/lusers");
 }
 
@@ -42,7 +50,7 @@ export const renderUpdateLuser = async (req, res) => {
 	const [result] = await pool.query("SELECT * FROM accounts where id = ?", [
 		id,
 	]);
-	res.render("managment_edit", { user: result[0], info: req.session });
+	res.render("account_edit", { user: result[0], info: req.session });
 }
 export const updateLuser = async (req, res) => {
 	const { id } = req.params;
@@ -57,7 +65,7 @@ export const renderDeleteLuser = async (req, res) => {
 	const [result] = await pool.query("SELECT * FROM accounts WHERE id = ?", [
 		id,
 	]);
-	res.render("management_delete", { user: result[0], info: req.session });
+	res.render("account_delete", { user: result[0], info: req.session });
 }
 export const deleteLuser = async (req, res) => {
 	const { id } = req.params;
@@ -65,7 +73,7 @@ export const deleteLuser = async (req, res) => {
 	res.redirect("/lusers");
 }
 
-/** Only Admin's can delete and edit donors. Lusers can add them, but that is it. */
+/** Only Susers can delete and edit donors. Lusers can add them, but that is it. */
 export const renderUpdateDonor = async (req, res) => {
 	if (!check(req, res)) { return; };
 	const { id } = req.params;
@@ -96,4 +104,12 @@ export const deleteDonor = async (req, res) => {
 	await pool.query("DELETE FROM donations WHERE donor = ?", [id]);
 	await pool.query("DELETE FROM donors WHERE id = ?", [id]);
 	res.redirect("/lusers");
+};
+
+
+export const renderDonations = async (req, res) => {
+	if (!check(req, res)) { return; };
+	const [rows] = await pool.query("SELECT * FROM donations");
+	const [rows2] = await pool.query("SELECT * FROM donors"); // We need to display the email of the donor that issued the donation.
+	res.render("donations", { donations: rows, donors: rows2, info: req.session });
 };

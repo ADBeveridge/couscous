@@ -16,7 +16,8 @@ create table accounts (
   notify boolean,
   organization int,
   hidden boolean,
-  foreign key (organization) references organizations (id)
+  foreign key (organization) references organizations (id),
+  unique (username)
 );
 
 create table donors (
@@ -29,7 +30,9 @@ create table donors (
   preferredContactMethod varchar(255),
   contactNotes varchar(255),
   frequency int,
-  lastPaymentDateTime datetime
+  creator int,
+  lastPaymentDateTime datetime,
+  foreign key (creator) references accounts(id)
 );
 
 create table donations (
@@ -46,8 +49,6 @@ create table donations (
   foreign key (donor) references donors(id)
 );
 
--- insert an account by default. every user is an admin, btw. 
-insert into accounts (username, password, status) values ('luser', 'luser', 'luser');
-insert into accounts (username, password, status) values ('suser', 'suser', 'suser');
+-- insert owner account by default.
 insert into accounts (username, password, status) values ('owner', 'owner', 'owner');
 
