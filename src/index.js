@@ -76,7 +76,9 @@ app.get('/', async (request, response) => {
 	/* Get a customers last donation, and coupled with his given donation frequency, calculate if he needs to donate today. */
 	var donorsDue = [];
 
-	const [result] = await pool.query("SELECT * FROM donors");
+	/** This query returns results that are only for this organization. */
+	const [result] = await pool.query("SELECT * FROM donors INNER JOIN accounts ON donors.creator = accounts.id where organization = ?", [request.session.organization]);
+	console.log(result);
 	for (var i = 0; i < result.length; i++) {
 		const [rows] = await pool.query('SELECT * FROM donations WHERE donor = ? ORDER BY paymentDateTime DESC', [result[i].id]);
 		if (rows.length === 0) {
@@ -117,6 +119,7 @@ app.post('/auth', async (request, response) => {
 	// Authenticate the user
 	request.session.loggedin = true;
 	request.session.username = uname;
+	request.session.userid = data[0].id;
 	request.session.status = data[0].status;
 	if (request.session.status != "owner") {
 		const [org] = await pool.query('SELECT * FROM organizations WHERE id = ?', [data[0].organization]);
