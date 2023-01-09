@@ -17,13 +17,13 @@ function check(req, res) {
 
 export const renderAddDonation = async (req, res) => {
 	if (!check(req, res)) { return; };
-	const [data] = await pool.query('SELECT * FROM donors');
+	const [data] = await pool.query('SELECT * FROM donors WHERE organization = ?', [req.session.organization]);
 	res.render("donation_create", { info: req.session, donors: data });
 };
 
 export const addDonation = async (req, res) => {
 	/* We need access to the id of the donor's email specified. */
-	const [data] = await pool.query('SELECT * FROM donors WHERE email = ?', [req.body.donor]);
+	const [data] = await pool.query('SELECT * FROM donors WHERE email = ? && organization = ?', [req.body.donor, req.session.organization]);
 	if (data.length == 0) {
 		res.send('Could not find that donor!');
 		return;
@@ -64,7 +64,8 @@ export const addDonor = async (req, res) => {
 			address: req.body.address,
 			preferredContactMethod: req.body.preferredContactMethod,
 			frequency: req.body.frequency,
-			creator: req.session.userid
+			creator: req.session.userid,
+			organization: req.session.organization
 		});
 	/* Is this needed? */
 	res.redirect("/createdonation");

@@ -102,8 +102,8 @@ export const renderDeleteOrganization = async (req, res) => {
 }
 export const deleteOrganization = async (req, res) => {
 	const { id } = req.params;
-	const [data] = await pool.query("SELECT * FROM accounts WHERE organization = ?", [id]);
-	await pool.query("DELETE FROM donations WHERE creator = ?", [data[0].id]);
+	await pool.query("DELETE FROM donations WHERE organization = ?", [id]);
+	await pool.query("DELETE FROM donors WHERE organization = ?", [id]);
 	await pool.query("DELETE FROM accounts WHERE organization = ?", [id]);
 	await pool.query("DELETE FROM organizations WHERE id = ?", [id]);
 	res.redirect("/susers");

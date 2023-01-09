@@ -21,9 +21,9 @@ function check(req, res) {
 /** Luser management. */
 export const renderLusers = async (req, res) => {
 	if (!check(req, res)) { return; };
-	const [result] = await pool.query("SELECT * FROM accounts WHERE status = 'luser' && hidden = 0");
-	const [organizations] = await pool.query("SELECT * FROM organizations");
-	const [rows] = await pool.query("SELECT * FROM donors");
+	const [result] = await pool.query("SELECT * FROM accounts WHERE status = 'luser' && hidden = 0 && organization = ?", req.session.organization);
+	const [organizations] = await pool.query("SELECT * FROM organizations WHERE id = ?", [req.session.organization]);
+	const [rows] = await pool.query("SELECT * FROM donors WHERE organization = ?", [req.session.organization]);
 	res.render("management", { users: result, info: req.session, donors: rows, organizations: organizations});
 };
 
@@ -47,9 +47,7 @@ export const renderUpdateLuser = async (req, res) => {
 	if (!check(req, res)) { return; };
 	if (req.session.status == "luser") { res.sendStatus(404); return; }
 	const { id } = req.params;
-	const [result] = await pool.query("SELECT * FROM accounts where id = ?", [
-		id,
-	]);
+	const [result] = await pool.query("SELECT * FROM accounts WHERE id = ?", [id]);
 	res.render("account_edit", { user: result[0], info: req.session });
 }
 export const updateLuser = async (req, res) => {
@@ -62,9 +60,7 @@ export const renderDeleteLuser = async (req, res) => {
 	if (!check(req, res)) { return; };
 	if (req.session.status == "luser") { res.sendStatus(404); return; }
 	const { id } = req.params;
-	const [result] = await pool.query("SELECT * FROM accounts WHERE id = ?", [
-		id,
-	]);
+	const [result] = await pool.query("SELECT * FROM accounts WHERE id = ?", [id]);
 	res.render("account_delete", { user: result[0], info: req.session });
 }
 export const deleteLuser = async (req, res) => {
@@ -77,9 +73,7 @@ export const deleteLuser = async (req, res) => {
 export const renderUpdateDonor = async (req, res) => {
 	if (!check(req, res)) { return; };
 	const { id } = req.params;
-	const [result] = await pool.query("SELECT * FROM donors WHERE id = ?", [
-		id,
-	]);
+	const [result] = await pool.query("SELECT * FROM donors WHERE id = ?", [id]);
 	res.render("donor_edit", { donor: result[0], info: req.session });
 };
 
@@ -93,9 +87,7 @@ export const updateDonor = async (req, res) => {
 export const renderDeleteDonor = async (req, res) => {
 	if (!check(req, res)) { return; };
 	const { id } = req.params;
-	const [result] = await pool.query("SELECT * FROM donors WHERE id = ?", [
-		id,
-	]);
+	const [result] = await pool.query("SELECT * FROM donors WHERE id = ?", [id]);
 	res.render("donor_delete", { donor: result[0], info: req.session });
 };
 
@@ -106,10 +98,9 @@ export const deleteDonor = async (req, res) => {
 	res.redirect("/lusers");
 };
 
-
-export const renderDonations = async (req, res) => {
+export const renderStatistics = async (req, res) => {
 	if (!check(req, res)) { return; };
-	const [rows] = await pool.query("SELECT * FROM donations");
-	const [rows2] = await pool.query("SELECT * FROM donors"); // We need to display the email of the donor that issued the donation.
-	res.render("donations", { donations: rows, donors: rows2, info: req.session });
+	const [rows] = await pool.query("SELECT * FROM donations WHERE organization = ?", [req.session.organization]);
+	const [rows2] = await pool.query("SELECT * FROM donors WHERE organization = ?", [req.session.organization]); // We need to display the email of the donor that issued the donation.
+	res.render("statistics", { donations: rows, donors: rows2, info: req.session });
 };

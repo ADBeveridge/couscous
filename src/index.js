@@ -21,7 +21,7 @@ import {
 	updateDonor,
 	renderDeleteDonor,
 	deleteDonor,
-	renderDonations
+	renderStatistics
 } from "./suser.js";
 
 /* Owner urls. */
@@ -77,7 +77,7 @@ app.get('/', async (request, response) => {
 	var donorsDue = [];
 
 	/** This query returns results that are only for this organization. */
-	const [result] = await pool.query("SELECT * FROM donors INNER JOIN accounts ON donors.creator = accounts.id where organization = ?", [request.session.organization]);
+	const [result] = await pool.query("SELECT * FROM donors WHERE organization = ?", [request.session.organization]);
 	console.log(result);
 	for (var i = 0; i < result.length; i++) {
 		const [rows] = await pool.query('SELECT * FROM donations WHERE donor = ? ORDER BY paymentDateTime DESC', [result[i].id]);
@@ -158,7 +158,7 @@ function check(request, res) {
 }
 
 /** Donation management. Can be used by both susers and lusers. */
-app.get("/donations", renderDonations);
+app.get("/statistics", renderStatistics);
 app.get("/createdonation", renderAddDonation);
 app.post("/createdonation", addDonation);
 

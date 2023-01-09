@@ -45,9 +45,11 @@ create table donations (
   paymentMethod varchar(255),
   paymentDetails varchar(510),
   inputDateTime datetime, 
+  organization int,
   creator int,
   donor int,
   foreign key (creator) references accounts(id),
+  foreign key (organization) references organizations(id),
   foreign key (donor) references donors(id)
 );
 
